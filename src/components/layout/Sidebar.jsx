@@ -17,11 +17,11 @@ export default function Sidebar() {
       </div>
 
       <nav className="space-y-2">
-        {links.map(({ to, label, icon: Icon }) => (
+        {links.map((link) => (
           <NavLink
-            key={to}
-            to={to}
-            end={to === "/"}
+            key={link.to}
+            to={link.to}
+            end={link.to === "/"}
             className={({ isActive }) =>
               `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition ${
                 isActive
@@ -30,8 +30,8 @@ export default function Sidebar() {
               }`
             }
           >
-            <Icon size={18} />
-            <span>{label}</span>
+            <link.icon size={18} />
+            <span>{link.label}</span>
           </NavLink>
         ))}
       </nav>
