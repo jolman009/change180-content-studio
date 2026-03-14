@@ -43,6 +43,17 @@ type RewriteRequest = {
 
 type GenerateContentRequest = GenerateRequest | RewriteRequest;
 
+type OpenAIResponsesPayload = {
+  output_text?: string;
+  output?: Array<{
+    type?: string;
+    content?: Array<{
+      type?: string;
+      text?: string;
+    }>;
+  }>;
+};
+
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -165,7 +176,10 @@ async function callOpenAI(body: GenerateContentRequest) {
     }),
   });
 
-  const payload = await response.json().catch(() => ({}));
+  const payload = (await response.json().catch(() => ({}))) as OpenAIResponsesPayload & {
+    error?: { message?: string };
+    message?: string;
+  };
 
   if (!response.ok) {
     const message =
@@ -175,7 +189,12 @@ async function callOpenAI(body: GenerateContentRequest) {
     throw new Error(message);
   }
 
-  const outputText = payload?.output_text;
+  const outputText =
+    payload.output_text ??
+    payload.output
+      ?.flatMap((item) => item.content ?? [])
+      .find((item) => item.type === "output_text" && typeof item.text === "string")
+      ?.text;
 
   if (!outputText) {
     throw new Error("OpenAI response did not contain output_text.");
