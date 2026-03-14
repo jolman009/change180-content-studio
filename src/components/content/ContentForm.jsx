@@ -79,7 +79,7 @@ export default function ContentForm({
 
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
-      <Button onClick={onGenerate} disabled={loading}>
+      <Button className="w-full sm:w-auto" onClick={onGenerate} disabled={loading}>
         {loading ? "Generating..." : "Generate Content"}
       </Button>
     </div>

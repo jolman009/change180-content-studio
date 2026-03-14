@@ -59,6 +59,10 @@ function normalizeString(value, fallback = "") {
   return typeof value === "string" ? value : fallback;
 }
 
+function normalizeOptionalDate(value) {
+  return typeof value === "string" && value.trim() ? value : null;
+}
+
 function normalizeHashtags(value) {
   if (Array.isArray(value)) {
     return value.filter((item) => typeof item === "string" && item.trim()).map((item) => item.trim());
@@ -197,7 +201,7 @@ export function toContentPostRecord(post) {
     cta: post.cta,
     hashtags: post.hashtags,
     visual_direction: post.visualDirection,
-    scheduled_for: post.scheduledFor,
+    scheduled_for: normalizeOptionalDate(post.scheduledFor),
   };
 }
 
@@ -217,7 +221,7 @@ export function toContentPostUpdate(updates) {
   if ("cta" in updates) updateRecord.cta = updates.cta;
   if ("hashtags" in updates) updateRecord.hashtags = updates.hashtags;
   if ("visualDirection" in updates) updateRecord.visual_direction = updates.visualDirection;
-  if ("scheduledFor" in updates) updateRecord.scheduled_for = updates.scheduledFor;
+  if ("scheduledFor" in updates) updateRecord.scheduled_for = normalizeOptionalDate(updates.scheduledFor);
 
   return updateRecord;
 }
@@ -241,4 +245,26 @@ export function fromContentPostRecord(record = {}) {
     createdAt: normalizeString(record.created_at, ""),
     scheduledFor: normalizeString(record.scheduled_for, ""),
   };
+}
+
+export function getDraftInputFromContentPost(post = {}) {
+  return normalizeContentDraftInput({
+    topic: post.topic,
+    platform: post.platform,
+    contentType: post.contentType,
+    pillar: post.pillar,
+    goal: post.goal,
+    tone: post.tone,
+    context: post.context,
+  });
+}
+
+export function getGeneratedContentFromContentPost(post = {}) {
+  return normalizeGeneratedContent({
+    hook: post.hook,
+    caption: post.body,
+    cta: post.cta,
+    hashtags: post.hashtags,
+    visual: post.visualDirection,
+  });
 }

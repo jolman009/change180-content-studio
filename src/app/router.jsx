@@ -17,6 +17,7 @@ export const router = createBrowserRouter([
       { index: true, element: <DashboardPage /> },
       { path: "brand", element: <BrandProfilePage /> },
       { path: "create", element: <CreateContentPage /> },
+      { path: "create/:draftId", element: <CreateContentPage /> },
       { path: "calendar", element: <CalendarPage /> },
       { path: "analytics", element: <AnalyticsNotesPage /> },
       { path: "*", element: <NotFoundPage /> },

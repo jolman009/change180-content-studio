@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Card from "../ui/Card";
 import EmptyState from "../ui/EmptyState";
 import Select from "../ui/Select";
@@ -21,10 +22,25 @@ export default function CalendarBoard({
 
   return (
     <Card title="Weekly Calendar" subtitle="Grouped by scheduled date with editable pipeline state">
+      <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-dashed border-[var(--border)] bg-white p-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold text-[var(--text)]">Create a new draft</p>
+          <p className="mt-1 text-sm text-gray-500">
+            Start something new without opening an existing saved draft.
+          </p>
+        </div>
+        <Link
+          className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white transition hover:opacity-90 touch-manipulation"
+          to="/create"
+        >
+          Create New Draft
+        </Link>
+      </div>
+
       <div className="space-y-6">
         {groups.map((group) => (
           <section key={group.date} className="space-y-3">
-            <div className="flex items-center justify-between border-b border-[var(--border)] pb-2">
+            <div className="flex flex-col gap-1 border-b border-[var(--border)] pb-2 sm:flex-row sm:items-center sm:justify-between">
               <h4 className="font-semibold text-[var(--text)]">{group.label}</h4>
               <span className="text-sm text-gray-500">{group.items.length} post(s)</span>
             </div>
@@ -35,21 +51,27 @@ export default function CalendarBoard({
                   key={post.id || `${post.topic}-${post.hook}`}
                   className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4"
                 >
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-sm font-semibold">{post.hook || post.topic}</p>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-500">
+                        Saved Draft
+                      </p>
+                      <Link
+                        className="mt-1 block text-sm font-semibold underline touch-manipulation"
+                        to={`/create/${post.id}`}
+                      >
+                        <span className="break-words">{post.hook || post.topic}</span>
+                      </Link>
                       <p className="mt-1 text-xs text-gray-500">
                         {post.platform} · {post.contentType} · {post.pillar}
                       </p>
                     </div>
-                    <span className="inline-block rounded-full bg-white px-3 py-1 text-xs capitalize">
+                    <span className="inline-block w-fit rounded-full bg-white px-3 py-1 text-xs capitalize">
                       {post.status}
                     </span>
                   </div>
 
-                  <p className="mt-3 text-sm text-gray-600 line-clamp-3">{post.body || post.cta}</p>
-
-                  <div className="mt-4 grid gap-3 md:grid-cols-2">
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
                     <Select
                       label="Status"
                       value={post.status}

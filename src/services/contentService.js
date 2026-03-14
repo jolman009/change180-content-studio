@@ -92,7 +92,10 @@ export async function updateContentPost(postId, updates) {
         ...updates,
       }),
       id: postId,
-      scheduled_for: updates.scheduledFor ?? storedPosts[postIndex].scheduled_for ?? "",
+      scheduled_for:
+        updates.scheduledFor !== undefined
+          ? updates.scheduledFor || null
+          : storedPosts[postIndex].scheduled_for ?? null,
       created_at: storedPosts[postIndex].created_at,
     };
 
@@ -138,6 +141,36 @@ export async function getContentPosts() {
 
   return {
     data: data.map(fromContentPostRecord),
+    source: "supabase",
+  };
+}
+
+export async function getContentPostById(postId) {
+  if (!hasSupabaseEnv || !supabase) {
+    const post = ensureSeedContentPosts()
+      .map(fromContentPostRecord)
+      .find((item) => item.id === postId);
+
+    if (!post) {
+      throw new Error("Content post not found.");
+    }
+
+    return {
+      data: post,
+      source: "local",
+    };
+  }
+
+  const { data, error } = await supabase
+    .from("content_posts")
+    .select(CONTENT_POST_SELECT)
+    .eq("id", postId)
+    .single();
+
+  if (error) throw error;
+
+  return {
+    data: fromContentPostRecord(data),
     source: "supabase",
   };
 }

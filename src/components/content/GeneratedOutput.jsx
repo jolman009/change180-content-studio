@@ -21,6 +21,7 @@ export default function GeneratedOutput({
   onRetryGenerate,
   onRewrite,
   onSaveDraft,
+  saveLabel = "Save Draft",
 }) {
   if (loading) {
     return (
@@ -84,14 +85,14 @@ export default function GeneratedOutput({
         </div>
       ) : null}
 
-      <div className="mb-4 flex flex-wrap gap-2">
+      <div className="mb-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
         {AI_TONE_ACTIONS.map((action) => (
           <Button
             key={action.id}
             onClick={() => onRewrite(action.id)}
             variant={activeRewriteAction === action.id ? "secondary" : "ghost"}
             disabled={isRewriting || isSaving}
-            className="text-sm"
+            className="w-full text-sm sm:w-auto"
           >
             {isRewriting && activeRewriteAction === action.id
               ? `${action.label}...`
@@ -132,8 +133,8 @@ export default function GeneratedOutput({
         </div>
 
         <div className="flex justify-end">
-          <Button onClick={onSaveDraft} disabled={isSaving}>
-            {isSaving ? "Saving Draft..." : "Save Draft"}
+          <Button className="w-full sm:w-auto" onClick={onSaveDraft} disabled={isSaving}>
+            {isSaving ? "Saving Draft..." : saveLabel}
           </Button>
         </div>
       </div>

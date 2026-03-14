@@ -1,4 +1,4 @@
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import StatCard from "../../components/dashboard/StatCard";
 import Card from "../../components/ui/Card";
 import EmptyState from "../../components/ui/EmptyState";
@@ -37,47 +37,72 @@ export default function DashboardPage() {
   const recentDrafts = buildRecentDrafts(filteredPosts);
   const hasSuggestedMoves = suggestedNextMoves.length > 0;
   const hasRecentDrafts = recentDrafts.length > 0;
+  const operatorSteps = [
+    {
+      title: "Refresh Brand Voice",
+      description: "Review tone rules and CTAs before generating anything new.",
+    },
+    {
+      title: "Build This Week's Drafts",
+      description: "Generate, rewrite, and save a balanced set of posts.",
+    },
+    {
+      title: "Log What Worked",
+      description: "Capture outcomes so the next batch gets sharper.",
+    },
+  ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <Card
         title="Weekly Operator View"
         subtitle="Start here if this is your first pass through the studio this week."
       >
-        <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-xl bg-[var(--bg)] p-4">
-            <h4 className="font-semibold">1. Refresh Brand Voice</h4>
-            <p className="mt-2 text-sm text-gray-600">
-              Review your tone rules and CTAs before generating anything new.
-            </p>
-          </div>
-          <div className="rounded-xl bg-[var(--bg)] p-4">
-            <h4 className="font-semibold">2. Build This Week&apos;s Drafts</h4>
-            <p className="mt-2 text-sm text-gray-600">
-              Use the Create route to generate, rewrite, and save a balanced set of posts.
-            </p>
-          </div>
-          <div className="rounded-xl bg-[var(--bg)] p-4">
-            <h4 className="font-semibold">3. Log What Worked</h4>
-            <p className="mt-2 text-sm text-gray-600">
-              Capture outcomes in Analytics Notes so the next batch gets sharper.
-            </p>
-          </div>
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg)] p-4 sm:hidden">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--primary)]">
+            This Week
+          </p>
+          <ol className="mt-3 space-y-3">
+            {operatorSteps.map((step, index) => (
+              <li key={step.title} className="flex gap-3">
+                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white text-xs font-semibold text-[var(--primary)]">
+                  {index + 1}
+                </span>
+                <div className="min-w-0">
+                  <h4 className="text-sm font-semibold">{step.title}</h4>
+                  <p className="mt-1 text-sm text-gray-600">{step.description}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <div className="hidden gap-4 sm:grid sm:grid-cols-3">
+          {operatorSteps.map((step, index) => (
+            <div key={step.title} className="rounded-xl bg-[var(--bg)] p-4">
+              <h4 className="font-semibold">
+                {index + 1}. {step.title}
+              </h4>
+              <p className="mt-2 text-sm text-gray-600">{step.description}</p>
+            </div>
+          ))}
         </div>
       </Card>
 
-      <section className="grid gap-4 md:grid-cols-4">
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {dashboardStats.map((stat) => (
           <StatCard key={stat.label} label={stat.label} value={stat.value} />
         ))}
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-2">
+      <section className="grid gap-4 lg:grid-cols-2 lg:gap-6">
         {hasSuggestedMoves ? (
           <Card title="Suggested Next Moves" subtitle="What the system should help you do next">
             <ul className="space-y-3 text-sm">
               {suggestedNextMoves.map((item) => (
-                <li key={item}>{item}</li>
+                <li key={item} className="rounded-xl bg-[var(--bg)] px-3 py-3">
+                  {item}
+                </li>
               ))}
             </ul>
           </Card>
@@ -92,8 +117,16 @@ export default function DashboardPage() {
           <Card title="Recent Drafts" subtitle="Latest content in the pipeline">
             <ul className="space-y-3 text-sm">
               {recentDrafts.map((item) => (
-                <li key={item.id || `${item.platform}-${item.hook}`}>
-                  {item.hook || item.topic} - {item.platform} {item.contentType}
+                <li
+                  key={item.id || `${item.platform}-${item.hook}`}
+                  className="rounded-xl bg-[var(--bg)] px-3 py-3"
+                >
+                  <Link className="font-medium underline" to={`/create/${item.id}`}>
+                    <span className="break-words">{item.hook || item.topic}</span>
+                  </Link>
+                  <p className="mt-1 text-xs text-gray-500">
+                    {item.platform} · {item.contentType}
+                  </p>
                 </li>
               ))}
             </ul>

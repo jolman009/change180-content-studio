@@ -167,11 +167,11 @@ export default function AnalyticsNotesPage() {
           />
         </div>
 
-        <div className="mt-5 flex items-center justify-between gap-4">
-          <p className="text-sm text-gray-500">
+        <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-gray-500 sm:max-w-xl">
             Use this log weekly to spot hooks, themes, and CTAs worth repeating.
           </p>
-          <Button onClick={onSave} disabled={saving}>
+          <Button className="w-full sm:w-auto" onClick={onSave} disabled={saving}>
             {saving ? "Saving Note..." : "Save Note"}
           </Button>
         </div>

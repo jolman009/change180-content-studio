@@ -14,7 +14,7 @@ export default function Button({
 
   return (
     <button
-      className={`rounded-xl px-4 py-2 font-medium transition ${variants[variant]} ${className}`}
+      className={`rounded-xl px-3 py-2 text-base font-medium transition sm:px-4 sm:text-sm ${variants[variant]} ${className}`}
       {...props}
     >
       {children}
