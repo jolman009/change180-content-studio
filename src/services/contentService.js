@@ -3,6 +3,7 @@ import {
   toContentPostRecord,
   toContentPostUpdate,
 } from "../lib/contentDraft";
+import { demoContentPosts } from "../lib/demoData";
 import { hasSupabaseEnv } from "../lib/runtime";
 import { supabase } from "../lib/supabaseClient";
 
@@ -25,6 +26,22 @@ function setStoredContentPosts(posts) {
   }
 
   window.localStorage.setItem(CONTENT_POSTS_STORAGE_KEY, JSON.stringify(posts));
+}
+
+function ensureSeedContentPosts() {
+  const storedPosts = getStoredContentPosts();
+  if (storedPosts.length > 0) {
+    return storedPosts;
+  }
+
+  const seededPosts = demoContentPosts.map((post) => ({
+    id: post.id,
+    ...toContentPostRecord(post),
+    created_at: post.createdAt,
+  }));
+
+  setStoredContentPosts(seededPosts);
+  return seededPosts;
 }
 
 export async function saveContentPost(post) {
@@ -107,7 +124,7 @@ export async function updateContentPost(postId, updates) {
 export async function getContentPosts() {
   if (!hasSupabaseEnv || !supabase) {
     return {
-      data: getStoredContentPosts().map(fromContentPostRecord),
+      data: ensureSeedContentPosts().map(fromContentPostRecord),
       source: "local",
     };
   }

@@ -236,12 +236,12 @@ Make the MVP coherent, testable, and usable for weekly content operations.
 
 ### In Scope
 
-- [ ] Add analytics notes page or section
-- [ ] Add responsive QA across primary routes
-- [ ] Add onboarding copy and helper text
-- [ ] Add smoke tests for routing and core flows
-- [ ] Add seed/demo content for first-run experience
-- [ ] Finalize docs for local dev, architecture, and workflow
+- [x] Add analytics notes page or section
+- [x] Add responsive QA across primary routes
+- [x] Add onboarding copy and helper text
+- [x] Add smoke tests for routing and core flows
+- [x] Add seed/demo content for first-run experience
+- [x] Finalize docs for local dev, architecture, and workflow
 
 ### Code Areas
 
@@ -255,6 +255,21 @@ Make the MVP coherent, testable, and usable for weekly content operations.
 - New user can navigate the product without explanation
 - Core flows behave predictably on desktop and mobile
 - Docs and environment setup are complete enough for handoff
+
+### Week 6 Status
+
+Completed:
+
+- Added an `Analytics Notes` route for manual post-performance logging with local-first fallback behavior
+- Seeded demo content posts and analytics notes so first-run local mode is not empty
+- Added onboarding/helper copy to the dashboard and content creation flow
+- Improved shell and sidebar behavior for smaller screens
+- Added Vitest smoke coverage for dashboard, create, calendar, and analytics routes
+- Updated README and architecture notes to reflect the launch-ready workflow and local test setup
+
+Open risk:
+
+- Responsive QA is covered through layout cleanup and smoke coverage, but there is still no screenshot-based or browser-matrix regression suite
 
 ## Backlog After Week 6
 

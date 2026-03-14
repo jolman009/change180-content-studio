@@ -50,6 +50,7 @@ Current files:
 - [BrandProfilePage.jsx](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/src/features/brand/BrandProfilePage.jsx)
 - [CreateContentPage.jsx](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/src/features/content/CreateContentPage.jsx)
 - [CalendarPage.jsx](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/src/features/calendar/CalendarPage.jsx)
+- [AnalyticsNotesPage.jsx](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/src/features/analytics/AnalyticsNotesPage.jsx)
 
 Current behavior:
 
@@ -113,6 +114,7 @@ Backend-facing integration layer.
 Current files:
 
 - [aiService.js](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/src/services/aiService.js)
+- [analyticsService.js](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/src/services/analyticsService.js)
 - [brandService.js](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/src/services/brandService.js)
 - [contentService.js](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/src/services/contentService.js)
 
@@ -227,6 +229,27 @@ Integration target:
 
 - Fetch posts via [contentService.js](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/src/services/contentService.js)
 - Group by date and status in the feature layer
+
+### Analytics Route
+
+Entry point:
+
+- `/analytics`
+
+Current container:
+
+- [AnalyticsNotesPage.jsx](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/src/features/analytics/AnalyticsNotesPage.jsx)
+
+Current state:
+
+- Supports manual performance logging
+- Seeds a demo note on first run in local mode
+- Falls back to local storage if a `performance_logs` table is unavailable
+
+Integration target:
+
+- Persist analytics observations through [analyticsService.js](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/src/services/analyticsService.js)
+- Expand into lightweight reporting once real performance data matters
 
 ## Current Data Boundaries
 
@@ -375,13 +398,8 @@ These contracts are the current frontend source of truth for Week 1 and should s
 
 ## Missing Technical Pieces
 
-- No backend endpoint implementation for AI generation
-- No real data loading on route entry
-- No centralized async state handling strategy
-- No form validation layer
-- No test suite yet
+- No browser-level end-to-end test coverage
 - No schema or migration files in this repo
-- No explicit error boundary or route-level recovery pattern
 
 ## Risks
 

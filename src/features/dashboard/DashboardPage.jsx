@@ -40,6 +40,32 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      <Card
+        title="Weekly Operator View"
+        subtitle="Start here if this is your first pass through the studio this week."
+      >
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="rounded-xl bg-[var(--bg)] p-4">
+            <h4 className="font-semibold">1. Refresh Brand Voice</h4>
+            <p className="mt-2 text-sm text-gray-600">
+              Review your tone rules and CTAs before generating anything new.
+            </p>
+          </div>
+          <div className="rounded-xl bg-[var(--bg)] p-4">
+            <h4 className="font-semibold">2. Build This Week&apos;s Drafts</h4>
+            <p className="mt-2 text-sm text-gray-600">
+              Use the Create route to generate, rewrite, and save a balanced set of posts.
+            </p>
+          </div>
+          <div className="rounded-xl bg-[var(--bg)] p-4">
+            <h4 className="font-semibold">3. Log What Worked</h4>
+            <p className="mt-2 text-sm text-gray-600">
+              Capture outcomes in Analytics Notes so the next batch gets sharper.
+            </p>
+          </div>
+        </div>
+      </Card>
+
       <section className="grid gap-4 md:grid-cols-4">
         {dashboardStats.map((stat) => (
           <StatCard key={stat.label} label={stat.label} value={stat.value} />

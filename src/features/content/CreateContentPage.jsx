@@ -229,6 +229,10 @@ export default function CreateContentPage() {
   return (
     <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
       <Card title="Create Content" subtitle="Turn a coaching idea into a usable social asset">
+        <div className="mb-4 rounded-xl border border-[var(--border)] bg-[var(--bg)] px-4 py-3 text-sm text-gray-600">
+          Start with one clear topic, pick the platform where it should live, then use rewrite
+          actions after generation instead of overstuffing the initial prompt.
+        </div>
         <ContentForm
           form={form}
           fieldErrors={fieldErrors}

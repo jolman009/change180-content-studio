@@ -67,6 +67,7 @@ npm run dev
 npm run build
 npm run preview
 npm run lint
+npm run test
 ```
 
 ## Current Integration Status
@@ -76,6 +77,8 @@ npm run lint
 - Supabase and API client modules are present, but the current pages still use local/demo state.
 - You can leave placeholder env values in place for frontend-only development.
 - The top bar shows whether the app is running in local mock mode or partial integration mode.
+- Local mock mode now seeds demo content posts and analytics notes for first-run experience.
+- Smoke tests cover the main dashboard, create, calendar, and analytics routes.
 
 ## Week 1 Foundation Decisions
 
