@@ -11,6 +11,7 @@ import {
   buildSuggestedNextMoves,
   getContentFiltersFromSearchParams,
 } from "../../lib/contentPipeline";
+import { getSuggestedMoveDestination } from "../../lib/nextMovesPlan";
 import { useContentPosts } from "../content/useContentPosts";
 
 export default function DashboardPage() {
@@ -101,10 +102,18 @@ export default function DashboardPage() {
             <ul className="space-y-3 text-sm">
               {suggestedNextMoves.map((item) => (
                 <li key={item} className="rounded-xl bg-[var(--bg)] px-3 py-3">
-                  {item}
+                  <Link className="flex items-start justify-between gap-3" to={getSuggestedMoveDestination(item)}>
+                    <span>{item}</span>
+                    <span className="shrink-0 font-medium text-[var(--primary)]">Open</span>
+                  </Link>
                 </li>
               ))}
             </ul>
+            <div className="mt-4">
+              <Link className="text-sm font-medium text-[var(--primary)] underline" to="/next-moves">
+                Open the acquisition playbook
+              </Link>
+            </div>
           </Card>
         ) : (
           <EmptyState

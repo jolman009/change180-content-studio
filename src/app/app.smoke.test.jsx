@@ -8,6 +8,7 @@ import CreateContentPage from "../features/content/CreateContentPage";
 import CalendarPage from "../features/calendar/CalendarPage";
 import AnalyticsNotesPage from "../features/analytics/AnalyticsNotesPage";
 import BrandProfilePage from "../features/brand/BrandProfilePage";
+import NextMovesPage from "../features/strategy/NextMovesPage";
 import { demoContentPosts } from "../lib/demoData";
 
 vi.mock("../features/content/useContentPosts", () => ({
@@ -29,6 +30,7 @@ function renderRoute(initialEntry = "/") {
         element: <App />,
         children: [
           { index: true, element: <DashboardPage /> },
+          { path: "next-moves", element: <NextMovesPage /> },
           { path: "brand", element: <BrandProfilePage /> },
           { path: "create", element: <CreateContentPage /> },
           { path: "calendar", element: <CalendarPage /> },
@@ -83,5 +85,16 @@ describe("app smoke routes", () => {
       ),
     ).toBeInTheDocument();
     expect(screen.getByText("Save Note")).toBeInTheDocument();
+  });
+
+  it("renders the next moves route", async () => {
+    renderRoute("/next-moves");
+
+    expect(
+      await screen.findByText(
+        "Adapted from the attached Change180 social calendar and narrowed to what fits this product.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText("Create New Draft").length).toBeGreaterThan(0);
   });
 });

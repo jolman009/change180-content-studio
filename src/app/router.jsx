@@ -7,6 +7,7 @@ import BrandProfilePage from "../features/brand/BrandProfilePage";
 import CreateContentPage from "../features/content/CreateContentPage";
 import CalendarPage from "../features/calendar/CalendarPage";
 import DashboardPage from "../features/dashboard/DashboardPage";
+import NextMovesPage from "../features/strategy/NextMovesPage";
 
 export const router = createBrowserRouter([
   {
@@ -15,6 +16,7 @@ export const router = createBrowserRouter([
     errorElement: <RouteErrorPage />,
     children: [
       { index: true, element: <DashboardPage /> },
+      { path: "next-moves", element: <NextMovesPage /> },
       { path: "brand", element: <BrandProfilePage /> },
       { path: "create", element: <CreateContentPage /> },
       { path: "create/:draftId", element: <CreateContentPage /> },
