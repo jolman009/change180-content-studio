@@ -173,6 +173,7 @@ export function createContentPost(input, generatedContent) {
     topic: normalizedInput.topic,
     context: normalizedInput.context,
     status: POST_STATUSES[0],
+    scheduledFor: "",
     hook: normalizedOutput.hook,
     body: normalizedOutput.caption,
     cta: normalizedOutput.cta,
@@ -196,7 +197,29 @@ export function toContentPostRecord(post) {
     cta: post.cta,
     hashtags: post.hashtags,
     visual_direction: post.visualDirection,
+    scheduled_for: post.scheduledFor,
   };
+}
+
+export function toContentPostUpdate(updates) {
+  const updateRecord = {};
+
+  if ("platform" in updates) updateRecord.platform = updates.platform;
+  if ("contentType" in updates) updateRecord.content_type = updates.contentType;
+  if ("pillar" in updates) updateRecord.pillar = updates.pillar;
+  if ("goal" in updates) updateRecord.goal = updates.goal;
+  if ("tone" in updates) updateRecord.tone = updates.tone;
+  if ("topic" in updates) updateRecord.topic = updates.topic;
+  if ("context" in updates) updateRecord.context = updates.context;
+  if ("status" in updates) updateRecord.status = updates.status;
+  if ("hook" in updates) updateRecord.hook = updates.hook;
+  if ("body" in updates) updateRecord.body = updates.body;
+  if ("cta" in updates) updateRecord.cta = updates.cta;
+  if ("hashtags" in updates) updateRecord.hashtags = updates.hashtags;
+  if ("visualDirection" in updates) updateRecord.visual_direction = updates.visualDirection;
+  if ("scheduledFor" in updates) updateRecord.scheduled_for = updates.scheduledFor;
+
+  return updateRecord;
 }
 
 export function fromContentPostRecord(record = {}) {

@@ -151,16 +151,16 @@ Connect draft content to a visible planning workflow.
 
 ### In Scope
 
-- [ ] Replace mock dashboard numbers with computed or fetched data
-- [ ] Replace mock calendar cards with real post records
-- [ ] Add post status transitions
-- [ ] Add filtering by platform, pillar, and status
-- [ ] Add weekly planning view or grouped calendar section
-- [ ] Add empty states for no-content scenarios
+- [x] Replace mock dashboard numbers with computed or fetched data
+- [x] Replace mock calendar cards with real post records
+- [x] Add post status transitions
+- [x] Add filtering by platform, pillar, and status
+- [x] Add weekly planning view or grouped calendar section
+- [x] Add empty states for no-content scenarios
 
 ### Code Areas
 
-- [DashboardPage.jsx](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/src/components/dashboard/DashboardPage.jsx)
+- [DashboardPage.jsx](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/src/features/dashboard/DashboardPage.jsx)
 - [CalendarPage.jsx](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/src/features/calendar/CalendarPage.jsx)
 - [CalendarBoard.jsx](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/src/components/calendar/CalendarBoard.jsx)
 - [Topbar.jsx](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/src/components/layout/Topbar.jsx)
@@ -171,6 +171,20 @@ Connect draft content to a visible planning workflow.
 - Content appears in dashboard and calendar views
 - Status progression is visible
 - Filtering supports practical weekly planning
+
+### Week 4 Status
+
+Completed:
+
+- Dashboard metrics and recent drafts are now computed from saved `content_posts`
+- Calendar records are grouped by scheduled date and can be updated in place for status and schedule
+- Search and filter controls for platform, pillar, and status live in the shared top bar for dashboard and calendar routes
+- Shared content loading and update behavior is centralized through `src/features/content/useContentPosts.js`
+- Empty, loading, and error states are used in both dashboard and calendar flows
+
+Open risk:
+
+- The Week 4 flow assumes saved content records are the single source of truth for dashboard and calendar views; if published analytics or scheduling metadata live elsewhere later, the aggregation helpers in `src/lib/contentPipeline.js` will need to be expanded
 
 ## Week 5: AI Generation Integration
 

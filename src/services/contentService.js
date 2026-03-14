@@ -1,6 +1,7 @@
 import {
   fromContentPostRecord,
   toContentPostRecord,
+  toContentPostUpdate,
 } from "../lib/contentDraft";
 import { hasSupabaseEnv } from "../lib/runtime";
 import { supabase } from "../lib/supabaseClient";
@@ -47,6 +48,51 @@ export async function saveContentPost(post) {
   const { data, error } = await supabase
     .from("content_posts")
     .insert(toContentPostRecord(post))
+    .select(CONTENT_POST_SELECT)
+    .single();
+
+  if (error) throw error;
+
+  return {
+    data: fromContentPostRecord(data),
+    source: "supabase",
+  };
+}
+
+export async function updateContentPost(postId, updates) {
+  if (!hasSupabaseEnv || !supabase) {
+    const storedPosts = getStoredContentPosts();
+    const postIndex = storedPosts.findIndex((post) => post.id === postId);
+
+    if (postIndex === -1) {
+      throw new Error("Content post not found.");
+    }
+
+    const updatedRecord = {
+      ...storedPosts[postIndex],
+      ...toContentPostRecord({
+        ...fromContentPostRecord(storedPosts[postIndex]),
+        ...updates,
+      }),
+      id: postId,
+      scheduled_for: updates.scheduledFor ?? storedPosts[postIndex].scheduled_for ?? "",
+      created_at: storedPosts[postIndex].created_at,
+    };
+
+    const nextPosts = storedPosts.slice();
+    nextPosts[postIndex] = updatedRecord;
+    setStoredContentPosts(nextPosts);
+
+    return {
+      data: fromContentPostRecord(updatedRecord),
+      source: "local",
+    };
+  }
+
+  const { data, error } = await supabase
+    .from("content_posts")
+    .update(toContentPostUpdate(updates))
+    .eq("id", postId)
     .select(CONTENT_POST_SELECT)
     .single();
 

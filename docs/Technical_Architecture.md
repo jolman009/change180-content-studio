@@ -140,7 +140,8 @@ Rendered screen:
 
 Current state:
 
-- Static metrics and static suggested items sourced from centralized mock data
+- Metrics, suggestions, and recent drafts are derived from saved content post records
+- Filtering is driven by URL search params shared with the top bar
 
 Gap:
 
@@ -149,6 +150,7 @@ Gap:
 Recommendation:
 
 - Fetch aggregated content and status data through a dedicated feature-level container
+- Keep aggregation and filtering logic outside the presentational stat cards
 
 ### Brand Route
 
@@ -217,7 +219,8 @@ Presentation:
 
 Current state:
 
-- Purely mock calendar data
+- Reads saved content post records through a shared feature hook
+- Groups posts by scheduled date with inline status and schedule updates
 
 Integration target:
 
