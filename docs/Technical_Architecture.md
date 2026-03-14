@@ -192,9 +192,9 @@ Presentation:
 
 Current state:
 
-- Uses local state
-- Uses a fake async delay
-- Writes a hardcoded generated payload into UI state
+- Uses a normalized `ContentDraftInput` contract for planning inputs
+- Routes generation through `aiService.js` with mock fallback when the API is unavailable
+- Supports editable structured output and save-draft flow through `contentService.js`
 
 Integration target:
 
@@ -332,15 +332,40 @@ These contracts are the current frontend source of truth for Week 1 and should s
 `ContentPost`
 
 - `platform`
+- `contentType`
+- `pillar`
+- `goal`
+- `tone`
+- `topic`
+- `context`
+- `status`
+- `hook`
+- `body`
+- `cta`
+- `hashtags`
+- `visualDirection`
+- `id` optional on read
+- `createdAt` optional on read
+- `scheduled_for`
+
+`ContentPostRecord`
+
+- `id` optional on read
+- `platform`
 - `content_type`
 - `pillar`
+- `goal`
+- `tone`
+- `topic`
+- `context`
 - `status`
 - `hook`
 - `body`
 - `cta`
 - `hashtags`
 - `visual_direction`
-- `scheduled_for`
+- `created_at` optional on read
+- `scheduled_for` optional on read
 
 ## Missing Technical Pieces
 

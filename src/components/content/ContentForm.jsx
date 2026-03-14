@@ -4,16 +4,26 @@ import Textarea from "../ui/Textarea";
 import Button from "../ui/Button";
 import {
   CONTENT_PILLARS,
-  CONTENT_TYPES,
   PLATFORM_GOALS,
   PLATFORM_TONES,
   PLATFORMS,
 } from "../../lib/constants";
+import { getAvailableContentTypes } from "../../lib/contentDraft";
 
-export default function ContentForm({ form, onChange, onGenerate, loading, error }) {
+export default function ContentForm({
+  form,
+  fieldErrors,
+  onChange,
+  onGenerate,
+  loading,
+  error,
+}) {
+  const availableContentTypes = getAvailableContentTypes(form.platform);
+
   return (
     <div className="space-y-4">
       <Input label="Topic" name="topic" value={form.topic} onChange={onChange} />
+      {fieldErrors.topic ? <p className="text-sm text-red-600">{fieldErrors.topic}</p> : null}
 
       <div className="grid gap-4 md:grid-cols-2">
         <Select label="Platform" name="platform" value={form.platform} onChange={onChange}>
@@ -28,11 +38,15 @@ export default function ContentForm({ form, onChange, onGenerate, loading, error
           value={form.contentType}
           onChange={onChange}
         >
-          {CONTENT_TYPES.map((item) => (
+          {availableContentTypes.map((item) => (
             <option key={item}>{item}</option>
           ))}
         </Select>
       </div>
+      {fieldErrors.platform ? <p className="text-sm text-red-600">{fieldErrors.platform}</p> : null}
+      {fieldErrors.contentType ? (
+        <p className="text-sm text-red-600">{fieldErrors.contentType}</p>
+      ) : null}
 
       <div className="grid gap-4 md:grid-cols-2">
         <Select label="Pillar" name="pillar" value={form.pillar} onChange={onChange}>
@@ -47,6 +61,7 @@ export default function ContentForm({ form, onChange, onGenerate, loading, error
           ))}
         </Select>
       </div>
+      {fieldErrors.pillar ? <p className="text-sm text-red-600">{fieldErrors.pillar}</p> : null}
 
       <Select label="Tone" name="tone" value={form.tone} onChange={onChange}>
         {PLATFORM_TONES.map((item) => (

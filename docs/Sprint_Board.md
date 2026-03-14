@@ -108,12 +108,12 @@ Turn the content creation screen into a structured draft workflow with reusable 
 
 ### In Scope
 
-- [ ] Define `content_posts` frontend payload shape
-- [ ] Split generated output into structured sections that match persisted fields
-- [ ] Add save-draft capability from the content creation screen
-- [ ] Add form validation and disabled states
-- [ ] Add content type and platform switching rules
-- [ ] Move static generation stub behind a clear adapter layer
+- [x] Define `content_posts` frontend payload shape
+- [x] Split generated output into structured sections that match persisted fields
+- [x] Add save-draft capability from the content creation screen
+- [x] Add form validation and disabled states
+- [x] Add content type and platform switching rules
+- [x] Move static generation stub behind a clear adapter layer
 
 ### Code Areas
 
@@ -128,6 +128,20 @@ Turn the content creation screen into a structured draft workflow with reusable 
 - User can create a structured draft
 - Draft data is saveable
 - Content form and output panel share a stable contract
+
+### Week 3 Status
+
+Completed:
+
+- `ContentDraftInput`, generated output, and `ContentPost` mapping now live in `src/lib/contentDraft.js`
+- The content form applies platform-specific content type rules and platform defaults for tone and goal
+- Generated output is editable by field before save and validates required draft content
+- Drafts save through `src/services/contentService.js` with local-storage fallback in mock mode
+- `src/services/aiService.js` now acts as the adapter boundary between the feature and API/mock generation
+
+Open risk:
+
+- The `content_posts` persistence shape assumes columns for `goal`, `tone`, `topic`, `context`, and `visual_direction`; if the production Supabase table differs, the service mapper will need to be aligned before relying on real persistence
 
 ## Week 4: Dashboard and Calendar Workflow
 
