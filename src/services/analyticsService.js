@@ -31,11 +31,20 @@ function ensureSeedPerformanceLogs() {
   return demoPerformanceLogs;
 }
 
+function getAnalyticsFallbackResult(error) {
+  return {
+    data: ensureSeedPerformanceLogs(),
+    source: "local",
+    fallbackReason: error?.message || "Supabase analytics is unavailable.",
+  };
+}
+
 export async function getPerformanceLogs() {
   if (!hasSupabaseEnv || !supabase) {
     return {
       data: ensureSeedPerformanceLogs(),
       source: "local",
+      fallbackReason: "Supabase environment variables are missing.",
     };
   }
 
@@ -63,11 +72,8 @@ export async function getPerformanceLogs() {
       data: normalized.length > 0 ? normalized : ensureSeedPerformanceLogs(),
       source: "supabase",
     };
-  } catch {
-    return {
-      data: ensureSeedPerformanceLogs(),
-      source: "local",
-    };
+  } catch (error) {
+    return getAnalyticsFallbackResult(error);
   }
 }
 
@@ -89,6 +95,7 @@ export async function savePerformanceLog(log) {
     return {
       data: record,
       source: "local",
+      fallbackReason: "Supabase environment variables are missing.",
     };
   }
 
@@ -125,13 +132,14 @@ export async function savePerformanceLog(log) {
       data: normalized,
       source: "supabase",
     };
-  } catch {
+  } catch (error) {
     const nextLogs = [record, ...getStoredPerformanceLogs()];
     setStoredPerformanceLogs(nextLogs);
 
     return {
       data: record,
       source: "local",
+      fallbackReason: error?.message || "Supabase analytics is unavailable.",
     };
   }
 }

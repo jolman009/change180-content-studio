@@ -31,11 +31,11 @@ export default function AnalyticsNotesPage() {
         if (active) {
           setLogs(result.data);
           setStatus({
-            type: "info",
+            type: result.source === "supabase" ? "info" : "error",
             message:
               result.source === "supabase"
                 ? "Analytics notes loaded from Supabase."
-                : "Analytics notes are currently running in local demo mode.",
+                : `Analytics notes are currently running in local demo mode. ${result.fallbackReason ?? ""}`.trim(),
           });
         }
       } catch (error) {
@@ -81,11 +81,11 @@ export default function AnalyticsNotesPage() {
       setLogs((prev) => [result.data, ...prev]);
       setForm(initialForm);
       setStatus({
-        type: "success",
+        type: result.source === "supabase" ? "success" : "error",
         message:
           result.source === "supabase"
             ? "Analytics note saved to Supabase."
-            : "Analytics note saved in local demo mode.",
+            : `Analytics note saved in local demo mode. ${result.fallbackReason ?? ""}`.trim(),
       });
     } catch (error) {
       setStatus({
