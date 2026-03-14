@@ -49,8 +49,16 @@ npm run lint
 ## Current Integration Status
 
 - The UI shell, routing, and page flows work locally without a backend.
+- Week 1 uses centralized mock data and shared empty/loading/error states while persistence is still being wired.
 - Supabase and API client modules are present, but the current pages still use local/demo state.
 - You can leave placeholder env values in place for frontend-only development.
+
+## Week 1 Foundation Decisions
+
+- Route-level orchestration lives in `src/features/`.
+- Reusable presentational UI lives in `src/components/`.
+- Canonical options and mock records live in `src/lib/`.
+- Missing Supabase or API env values should fail gracefully instead of crashing the app at startup.
 
 ## Project Structure
 

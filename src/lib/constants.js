@@ -18,3 +18,17 @@ export const CONTENT_TYPES = [
 ];
 
 export const POST_STATUSES = ["draft", "approved", "scheduled", "posted"];
+
+export const PLATFORM_GOALS = [
+  "Engagement",
+  "Education",
+  "Coaching Inquiry",
+  "Community Building",
+];
+
+export const PLATFORM_TONES = [
+  "Grounded, hopeful, direct",
+  "Reflective and clarifying",
+  "Practical and encouraging",
+  "Warm and invitational",
+];

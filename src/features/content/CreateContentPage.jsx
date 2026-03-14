@@ -2,21 +2,13 @@ import { useState } from "react";
 import Card from "../../components/ui/Card";
 import ContentForm from "../../components/content/ContentForm";
 import GeneratedOutput from "../../components/content/GeneratedOutput";
-
-const initialForm = {
-  topic: "",
-  platform: "Instagram",
-  contentType: "Caption Post",
-  pillar: "Mindset Shifts",
-  goal: "Engagement",
-  tone: "Grounded, hopeful, direct",
-  context: "",
-};
+import { mockContentForm, mockGeneratedContent } from "../../lib/mockData";
 
 export default function CreateContentPage() {
-  const [form, setForm] = useState(initialForm);
+  const [form, setForm] = useState(mockContentForm);
   const [loading, setLoading] = useState(false);
   const [output, setOutput] = useState(null);
+  const [error, setError] = useState("");
 
   function onChange(e) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -24,25 +16,18 @@ export default function CreateContentPage() {
 
   async function onGenerate() {
     setLoading(true);
+    setError("");
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      if (!form.topic.trim()) {
+        throw new Error("Add a topic before generating content.");
+      }
 
-      setOutput({
-        hook: "You do not need a new life overnight. You need one honest step today.",
-        caption:
-          "Growth is rarely loud. Sometimes it looks like a hard conversation, a boundary kept, or a quiet choice to stop betraying yourself. Change begins when clarity becomes action.\n\nIf this is your season to reset, do not wait for perfect conditions. Start with truth. Start with one turn in the right direction.",
-        cta: "Save this for the day you need a reset, and message Change180 if you're ready for guided growth.",
-        hashtags: [
-          "#Change180",
-          "#MindsetShift",
-          "#LifeCoaching",
-          "#PersonalGrowth",
-          "#HealingJourney",
-        ],
-        visual:
-          "Clean branded quote graphic with soft cream background, teal headline, and warm accent line.",
-      });
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      setOutput(mockGeneratedContent);
+    } catch (err) {
+      setOutput(null);
+      setError(err.message || "Unable to generate content.");
     } finally {
       setLoading(false);
     }
@@ -56,10 +41,11 @@ export default function CreateContentPage() {
           onChange={onChange}
           onGenerate={onGenerate}
           loading={loading}
+          error={error}
         />
       </Card>
 
-      <GeneratedOutput output={output} />
+      <GeneratedOutput output={output} loading={loading} error={error} />
     </div>
   );
 }

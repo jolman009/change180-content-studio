@@ -1,17 +1,9 @@
 import { useState } from "react";
 import BrandProfileForm from "../../components/brand/BrandProfileForm";
-
-const initialForm = {
-  brand_name: "Change180",
-  target_audience: "Adults seeking clarity, growth, and life direction",
-  mission: "Help people renew mindset, gain clarity, and take practical steps toward lasting change.",
-  tone_rules: "Grounded, hopeful, direct, reflective, practical. Avoid fluff and hype.",
-  preferred_ctas: "Book a session, reflect on this, save this post, share with someone who needs it.",
-  banned_phrases: "Boss babe, hustle harder, healing vibes only, manifest it all",
-};
+import { mockBrandProfile } from "../../lib/mockData";
 
 export default function BrandProfilePage() {
-  const [form, setForm] = useState(initialForm);
+  const [form, setForm] = useState(mockBrandProfile);
 
   function onChange(e) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));

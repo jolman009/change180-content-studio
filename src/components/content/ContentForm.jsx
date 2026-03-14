@@ -2,9 +2,15 @@ import Input from "../ui/Input";
 import Select from "../ui/Select";
 import Textarea from "../ui/Textarea";
 import Button from "../ui/Button";
-import { CONTENT_PILLARS, CONTENT_TYPES, PLATFORMS } from "../../lib/constants";
+import {
+  CONTENT_PILLARS,
+  CONTENT_TYPES,
+  PLATFORM_GOALS,
+  PLATFORM_TONES,
+  PLATFORMS,
+} from "../../lib/constants";
 
-export default function ContentForm({ form, onChange, onGenerate, loading }) {
+export default function ContentForm({ form, onChange, onGenerate, loading, error }) {
   return (
     <div className="space-y-4">
       <Input label="Topic" name="topic" value={form.topic} onChange={onChange} />
@@ -35,10 +41,18 @@ export default function ContentForm({ form, onChange, onGenerate, loading }) {
           ))}
         </Select>
 
-        <Input label="Goal" name="goal" value={form.goal} onChange={onChange} />
+        <Select label="Goal" name="goal" value={form.goal} onChange={onChange}>
+          {PLATFORM_GOALS.map((item) => (
+            <option key={item}>{item}</option>
+          ))}
+        </Select>
       </div>
 
-      <Input label="Tone" name="tone" value={form.tone} onChange={onChange} />
+      <Select label="Tone" name="tone" value={form.tone} onChange={onChange}>
+        {PLATFORM_TONES.map((item) => (
+          <option key={item}>{item}</option>
+        ))}
+      </Select>
 
       <Textarea
         label="Additional Context"
@@ -47,6 +61,8 @@ export default function ContentForm({ form, onChange, onGenerate, loading }) {
         onChange={onChange}
         placeholder="Ex: this post should feel grounded, hopeful, and invite coaching inquiry."
       />
+
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
       <Button onClick={onGenerate} disabled={loading}>
         {loading ? "Generating..." : "Generate Content"}

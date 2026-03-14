@@ -1,13 +1,33 @@
 import Card from "../ui/Card";
+import EmptyState from "../ui/EmptyState";
+import ErrorState from "../ui/ErrorState";
+import LoadingState from "../ui/LoadingState";
 
-export default function GeneratedOutput({ output }) {
+export default function GeneratedOutput({ output, loading, error }) {
+  if (loading) {
+    return (
+      <LoadingState
+        title="Generating Output"
+        description="Building a draft from the current prompt inputs."
+      />
+    );
+  }
+
+  if (error) {
+    return (
+      <ErrorState
+        title="Generated Output"
+        message={error}
+      />
+    );
+  }
+
   if (!output) {
     return (
-      <Card title="Generated Output" subtitle="Your AI draft will appear here.">
-        <p className="text-sm text-gray-500">
-          Nothing generated yet. Feed the machine a worthy thought.
-        </p>
-      </Card>
+      <EmptyState
+        title="Generated Output"
+        description="Nothing generated yet. Feed the machine a worthy thought."
+      />
     );
   }
 
