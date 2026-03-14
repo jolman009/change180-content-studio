@@ -226,7 +226,7 @@ Completed:
 
 Open risk:
 
-- The repo still does not contain the backend endpoint itself, so live generation will only work after an external service implements the documented contract
+- The edge function now exists in-repo, but live generation still depends on deployed Supabase function infrastructure, OpenAI secrets, and a valid `VITE_API_BASE_URL`
 
 ## Week 6: Polish, QA, and Launch Readiness
 

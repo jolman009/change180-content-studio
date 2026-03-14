@@ -267,7 +267,7 @@ Recommendation:
 Implications:
 
 - the frontend expects a separate backend or API service
-- that backend is not present in this repo yet
+- a Supabase Edge Function can now satisfy this contract in-repo
 - request mode can be `generate` or `rewrite`
 - response shape is normalized by the service layer
 

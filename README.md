@@ -26,7 +26,7 @@ cp .env.example .env
 ```env
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-VITE_API_BASE_URL=http://localhost:3001
+VITE_API_BASE_URL=http://127.0.0.1:54321/functions/v1
 ```
 
 4. Start the dev server:
@@ -36,6 +36,29 @@ npm run dev
 ```
 
 The app runs at `http://localhost:5173` by default.
+
+## Supabase Edge Function
+
+The frontend expects a `POST /generate-content` endpoint. This repo now includes a Supabase Edge Function at [supabase/functions/generate-content/index.ts](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/supabase/functions/generate-content/index.ts) that matches the contract in [docs/Generate_Content_API_Contract.md](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/docs/Generate_Content_API_Contract.md).
+
+Local setup:
+
+```bash
+supabase start
+supabase secrets set OPENAI_API_KEY=your_openai_api_key OPENAI_MODEL=gpt-5-mini
+supabase functions serve generate-content --no-verify-jwt
+```
+
+Then point `VITE_API_BASE_URL` to `http://127.0.0.1:54321/functions/v1`.
+
+Deploy:
+
+```bash
+supabase functions deploy generate-content --no-verify-jwt
+supabase secrets set OPENAI_API_KEY=your_openai_api_key OPENAI_MODEL=gpt-5-mini
+```
+
+Use your deployed function base URL for `VITE_API_BASE_URL`.
 
 ## Available Scripts
 
