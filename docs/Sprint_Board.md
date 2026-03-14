@@ -66,12 +66,12 @@ Make Brand Settings a real data workflow instead of a local-only form.
 
 ### In Scope
 
-- [ ] Define the `brand_profiles` frontend shape
-- [ ] Replace local-only save behavior with service-backed persistence
-- [ ] Add load-on-page-entry behavior for saved brand data
-- [ ] Add validation for required voice fields
-- [ ] Add save success and error states
-- [ ] Add fallback mock mode if backend is unavailable
+- [x] Define the `brand_profiles` frontend shape
+- [x] Replace local-only save behavior with service-backed persistence
+- [x] Add load-on-page-entry behavior for saved brand data
+- [x] Add validation for required voice fields
+- [x] Add save success and error states
+- [x] Add fallback mock mode if backend is unavailable
 
 ### Code Areas
 
@@ -85,6 +85,20 @@ Make Brand Settings a real data workflow instead of a local-only form.
 - Brand profile can be loaded and saved
 - Errors are visible and recoverable
 - Form state structure matches the intended DB contract
+
+### Week 2 Status
+
+Completed:
+
+- `BrandProfile` and `BrandProfileRecord` contracts are defined and normalized through `src/lib/brandProfile.js`
+- Brand Settings loads on route entry and saves through `src/services/brandService.js`
+- Supabase persistence now uses explicit record mapping instead of passing UI state through raw `upsert`
+- Local mock mode persists the brand profile to local storage when Supabase is unavailable
+- Required voice fields, save feedback, and recoverable load/save states are visible in the UI
+
+Open risk:
+
+- The service currently assumes `brand_profiles` exposes an `id` column on read for update-in-place behavior; if the production table uses a different singleton strategy, that schema still needs to be aligned
 
 ## Week 3: Content Creation Core
 

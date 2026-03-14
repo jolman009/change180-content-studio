@@ -166,12 +166,14 @@ Presentation:
 
 Current state:
 
-- Uses local state with seeded values
-- Save action is a placeholder
+- Uses a normalized frontend `BrandProfile` shape
+- Loads on page entry and saves through the service layer
+- Falls back to local storage when Supabase is unavailable
 
 Integration target:
 
 - Load and save via [brandService.js](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/src/services/brandService.js)
+- Keep DB-row mapping isolated from the form contract through `src/lib/brandProfile.js`
 
 ### Content Creation Route
 
@@ -296,6 +298,18 @@ These contracts are the current frontend source of truth for Week 1 and should s
 - `tone_rules`
 - `preferred_ctas`
 - `banned_phrases`
+
+`BrandProfileRecord`
+
+- `id` optional on read
+- `brand_name`
+- `target_audience`
+- `mission`
+- `tone_rules`
+- `preferred_ctas`
+- `banned_phrases`
+- `created_at` optional on read
+- `updated_at` optional on read
 
 `ContentDraftInput`
 
