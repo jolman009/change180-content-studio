@@ -52,6 +52,7 @@ npm run lint
 - Week 1 uses centralized mock data and shared empty/loading/error states while persistence is still being wired.
 - Supabase and API client modules are present, but the current pages still use local/demo state.
 - You can leave placeholder env values in place for frontend-only development.
+- The top bar shows whether the app is running in local mock mode or partial integration mode.
 
 ## Week 1 Foundation Decisions
 

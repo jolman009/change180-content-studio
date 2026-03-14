@@ -1,11 +1,11 @@
-export async function apiPost(path, body) {
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+import { hasApiBaseUrl } from "./runtime";
 
-  if (!apiBaseUrl) {
+export async function apiPost(path, body) {
+  if (!hasApiBaseUrl) {
     throw new Error("VITE_API_BASE_URL is not set. The app is running in local mock mode.");
   }
 
-  const response = await fetch(`${apiBaseUrl}${path}`, {
+  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}${path}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
