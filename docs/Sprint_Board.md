@@ -194,25 +194,39 @@ Replace the local generation stub with a real generation path that respects bran
 
 ### In Scope
 
-- [ ] Define request/response contract for generation
-- [ ] Create backend endpoint contract for `/generate-content`
-- [ ] Wire `generateContent()` into the content flow
-- [ ] Inject brand profile context into generation requests
-- [ ] Add loading, retry, and failure handling
-- [ ] Add rewrite/tone actions on generated content
+- [x] Define request/response contract for generation
+- [x] Create backend endpoint contract for `/generate-content`
+- [x] Wire `generateContent()` into the content flow
+- [x] Inject brand profile context into generation requests
+- [x] Add loading, retry, and failure handling
+- [x] Add rewrite/tone actions on generated content
 
 ### Code Areas
 
 - [CreateContentPage.jsx](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/src/features/content/CreateContentPage.jsx)
 - [aiService.js](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/src/services/aiService.js)
 - [api.js](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/src/lib/api.js)
-- backend endpoint not yet present in this repo
+- [Generate_Content_API_Contract.md](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/docs/Generate_Content_API_Contract.md)
 
 ### Exit Criteria
 
 - Live generation works against a real endpoint
 - Generated fields map cleanly into persisted drafts
 - Failure states do not break the editor flow
+
+### Week 5 Status
+
+Completed:
+
+- Request and response shapes for `/generate-content` are documented in `docs/Generate_Content_API_Contract.md`
+- `src/services/aiService.js` now owns generation and rewrite request assembly, normalization, and retry behavior
+- Brand profile context is injected into generate and rewrite payloads
+- The content screen supports rewrite actions for softer, stronger, clearer, shorter, and more direct outputs
+- Generation failures surface retryable UI instead of leaving the editor in a dead state
+
+Open risk:
+
+- The repo still does not contain the backend endpoint itself, so live generation will only work after an external service implements the documented contract
 
 ## Week 6: Polish, QA, and Launch Readiness
 

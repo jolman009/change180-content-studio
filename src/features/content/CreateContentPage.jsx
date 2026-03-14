@@ -12,16 +12,19 @@ import {
   validateGeneratedContent,
 } from "../../lib/contentDraft";
 import { getBrandProfile } from "../../services/brandService";
-import { generateContent } from "../../services/aiService";
+import { generateContent, rewriteGeneratedContent } from "../../services/aiService";
 import { saveContentPost } from "../../services/contentService";
 
 export default function CreateContentPage() {
   const [form, setForm] = useState(createContentDraftInput);
   const [loading, setLoading] = useState(false);
+  const [isRewriting, setIsRewriting] = useState(false);
+  const [activeRewriteAction, setActiveRewriteAction] = useState("");
   const [output, setOutput] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
   const [outputErrors, setOutputErrors] = useState({});
   const [generateError, setGenerateError] = useState("");
+  const [aiStatus, setAiStatus] = useState({ type: "", message: "" });
   const [saveStatus, setSaveStatus] = useState({ type: "", message: "" });
   const [isSaving, setIsSaving] = useState(false);
   const [brandProfile, setBrandProfile] = useState(null);
@@ -79,6 +82,7 @@ export default function CreateContentPage() {
       return next;
     });
     setGenerateError("");
+    setAiStatus({ type: "", message: "" });
   }
 
   function onOutputChange(e) {
@@ -108,6 +112,7 @@ export default function CreateContentPage() {
       return next;
     });
     setSaveStatus({ type: "", message: "" });
+    setAiStatus({ type: "", message: "" });
   }
 
   async function onGenerate() {
@@ -123,16 +128,55 @@ export default function CreateContentPage() {
     setLoading(true);
     setGenerateError("");
     setFieldErrors({});
+    setOutputErrors({});
+    setAiStatus({ type: "", message: "" });
     setSaveStatus({ type: "", message: "" });
 
     try {
       const generated = await generateContent(form, brandProfile);
       setOutput(normalizeGeneratedContent(generated));
+      setAiStatus({
+        type: "success",
+        message: "Draft generated with current brand context.",
+      });
     } catch (err) {
       setOutput(null);
       setGenerateError(err.message || "Unable to generate content.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function onRewrite(actionId) {
+    if (!output) {
+      setAiStatus({
+        type: "error",
+        message: "Generate content before using rewrite actions.",
+      });
+      return;
+    }
+
+    setIsRewriting(true);
+    setActiveRewriteAction(actionId);
+    setGenerateError("");
+    setAiStatus({ type: "", message: "" });
+    setSaveStatus({ type: "", message: "" });
+
+    try {
+      const rewritten = await rewriteGeneratedContent(form, output, actionId, brandProfile);
+      setOutput(normalizeGeneratedContent(rewritten));
+      setAiStatus({
+        type: "success",
+        message: `Applied the ${actionId.replace("_", " ")} rewrite action.`,
+      });
+    } catch (err) {
+      setAiStatus({
+        type: "error",
+        message: err.message || "Unable to rewrite the generated content.",
+      });
+    } finally {
+      setIsRewriting(false);
+      setActiveRewriteAction("");
     }
   }
 
@@ -199,10 +243,15 @@ export default function CreateContentPage() {
         output={output}
         loading={loading}
         error={generateError}
+        aiStatus={aiStatus}
+        isRewriting={isRewriting}
+        activeRewriteAction={activeRewriteAction}
         fieldErrors={outputErrors}
         saveStatus={saveStatus}
         isSaving={isSaving}
         onChange={onOutputChange}
+        onRetryGenerate={onGenerate}
+        onRewrite={onRewrite}
         onSaveDraft={onSaveDraft}
       />
     </div>

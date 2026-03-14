@@ -195,13 +195,14 @@ Presentation:
 Current state:
 
 - Uses a normalized `ContentDraftInput` contract for planning inputs
-- Routes generation through `aiService.js` with mock fallback when the API is unavailable
+- Routes generation and rewrite actions through `aiService.js` with mock fallback when the API is unavailable
 - Supports editable structured output and save-draft flow through `contentService.js`
 
 Integration target:
 
 - Generate via [aiService.js](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/src/services/aiService.js)
 - Persist drafts via [contentService.js](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/src/services/contentService.js)
+- Respect the request/response contract documented in [Generate_Content_API_Contract.md](/Users/joelguzman/Vibe-Code/change180-content-studio/change180-content-studio/docs/Generate_Content_API_Contract.md)
 
 ### Calendar Route
 
@@ -267,12 +268,14 @@ Implications:
 
 - the frontend expects a separate backend or API service
 - that backend is not present in this repo yet
-- response shape is currently undocumented in code
+- request mode can be `generate` or `rewrite`
+- response shape is normalized by the service layer
 
 Recommendation:
 
 - define a stable request/response contract before wiring the UI
 - validate response payloads before storing them in component state
+- keep retry logic in the service layer so feature components stay focused on UI state
 
 ## Recommended Near-Term Architecture
 
