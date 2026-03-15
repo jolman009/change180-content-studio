@@ -7,6 +7,8 @@ import Input from "../ui/Input";
 import Button from "../ui/Button";
 import PostPreview from "./PostPreview";
 import QuoteCard from "./QuoteCard";
+import PublishStatusBadge from "./PublishStatusBadge";
+import PublishButton from "./PublishButton";
 import { AI_TONE_ACTIONS } from "../../lib/aiGeneration";
 
 export default function GeneratedOutput({
@@ -26,6 +28,10 @@ export default function GeneratedOutput({
   onRewrite,
   onSaveDraft,
   saveLabel = "Save Draft",
+  publishStatus,
+  onPublish,
+  isPublishing,
+  postStatus,
 }) {
   if (loading) {
     return (
@@ -144,6 +150,33 @@ export default function GeneratedOutput({
             {isSaving ? "Saving Draft..." : saveLabel}
           </Button>
         </div>
+
+        {publishStatus ? (
+          <div className="mt-4 space-y-3 border-t border-[var(--border)] pt-4">
+            {(publishStatus.publishedAt || publishStatus.publishError) ? (
+              <PublishStatusBadge
+                publishedAt={publishStatus.publishedAt}
+                platformPostId={publishStatus.platformPostId}
+                publishError={publishStatus.publishError}
+                platform={platform}
+              />
+            ) : null}
+            <div className="flex justify-end">
+              <PublishButton
+                post={{
+                  id: publishStatus.postId,
+                  platform,
+                  status: postStatus || "draft",
+                  publishedAt: publishStatus.publishedAt,
+                  publishError: publishStatus.publishError,
+                }}
+                onPublish={onPublish}
+                isPublishing={isPublishing}
+                disabled={isSaving}
+              />
+            </div>
+          </div>
+        ) : null}
       </div>
     </Card>
   );

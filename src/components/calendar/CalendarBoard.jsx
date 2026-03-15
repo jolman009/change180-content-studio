@@ -3,6 +3,9 @@ import Card from "../ui/Card";
 import EmptyState from "../ui/EmptyState";
 import Select from "../ui/Select";
 import Input from "../ui/Input";
+import PublishStatusBadge from "../content/PublishStatusBadge";
+import PublishButton from "../content/PublishButton";
+import DuplicateToMenu from "./DuplicateToMenu";
 import { POST_STATUSES } from "../../lib/constants";
 
 export default function CalendarBoard({
@@ -10,6 +13,10 @@ export default function CalendarBoard({
   savingPostId,
   onStatusChange,
   onScheduleChange,
+  onPublish,
+  publishingPostId,
+  onDuplicate,
+  duplicatingPostId,
 }) {
   if (groups.length === 0) {
     return (
@@ -93,6 +100,38 @@ export default function CalendarBoard({
                       disabled={savingPostId === post.id}
                     />
                   </div>
+
+                  {(post.publishedAt || post.publishError) ? (
+                    <div className="mt-3">
+                      <PublishStatusBadge
+                        publishedAt={post.publishedAt}
+                        platformPostId={post.platformPostId}
+                        publishError={post.publishError}
+                        platform={post.platform}
+                      />
+                    </div>
+                  ) : null}
+
+                  {onPublish && !post.publishedAt ? (
+                    <div className="mt-3 flex justify-end">
+                      <PublishButton
+                        post={post}
+                        onPublish={onPublish}
+                        isPublishing={publishingPostId === post.id}
+                        disabled={savingPostId === post.id}
+                      />
+                    </div>
+                  ) : null}
+
+                  {onDuplicate ? (
+                    <div className="mt-3 border-t border-[var(--border)] pt-3">
+                      <DuplicateToMenu
+                        currentPlatform={post.platform}
+                        onDuplicate={(targetPlatform) => onDuplicate(post.id, targetPlatform)}
+                        disabled={duplicatingPostId === post.id || savingPostId === post.id}
+                      />
+                    </div>
+                  ) : null}
                 </article>
               ))}
             </div>

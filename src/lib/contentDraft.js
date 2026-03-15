@@ -202,6 +202,9 @@ export function toContentPostRecord(post) {
     hashtags: post.hashtags,
     visual_direction: post.visualDirection,
     scheduled_for: normalizeOptionalDate(post.scheduledFor),
+    platform_post_id: post.platformPostId ?? null,
+    published_at: post.publishedAt ?? null,
+    publish_error: post.publishError ?? null,
   };
 }
 
@@ -222,6 +225,9 @@ export function toContentPostUpdate(updates) {
   if ("hashtags" in updates) updateRecord.hashtags = updates.hashtags;
   if ("visualDirection" in updates) updateRecord.visual_direction = updates.visualDirection;
   if ("scheduledFor" in updates) updateRecord.scheduled_for = normalizeOptionalDate(updates.scheduledFor);
+  if ("platformPostId" in updates) updateRecord.platform_post_id = updates.platformPostId ?? null;
+  if ("publishedAt" in updates) updateRecord.published_at = updates.publishedAt ?? null;
+  if ("publishError" in updates) updateRecord.publish_error = updates.publishError ?? null;
 
   return updateRecord;
 }
@@ -244,6 +250,9 @@ export function fromContentPostRecord(record = {}) {
     visualDirection: normalizeString(record.visual_direction, ""),
     createdAt: normalizeString(record.created_at, ""),
     scheduledFor: normalizeString(record.scheduled_for, ""),
+    platformPostId: record.platform_post_id ?? null,
+    publishedAt: record.published_at ?? null,
+    publishError: record.publish_error ?? null,
   };
 }
 

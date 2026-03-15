@@ -17,6 +17,7 @@ import {
 import { getBrandProfile } from "../../services/brandService";
 import { generateContent, rewriteGeneratedContent } from "../../services/aiService";
 import { getContentPostById, saveContentPost, updateContentPost } from "../../services/contentService";
+import { publishPost } from "../../services/publishService";
 
 export default function CreateContentPage() {
   const { draftId } = useParams();
@@ -35,6 +36,9 @@ export default function CreateContentPage() {
   const [draftLoadError, setDraftLoadError] = useState("");
   const [draftLoading, setDraftLoading] = useState(Boolean(draftId));
   const [currentDraftId, setCurrentDraftId] = useState(draftId ?? "");
+  const [publishStatus, setPublishStatus] = useState(null);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [postStatus, setPostStatus] = useState("draft");
 
   useEffect(() => {
     let isMounted = true;
@@ -83,6 +87,13 @@ export default function CreateContentPage() {
         setCurrentDraftId(result.data.id ?? draftId);
         setForm(getDraftInputFromContentPost(result.data));
         setOutput(getGeneratedContentFromContentPost(result.data));
+        setPostStatus(result.data.status || "draft");
+        setPublishStatus({
+          postId: result.data.id ?? draftId,
+          publishedAt: result.data.publishedAt,
+          platformPostId: result.data.platformPostId,
+          publishError: result.data.publishError,
+        });
         setAiStatus({
           type: "info",
           message: "Loaded saved draft into the editor.",
@@ -234,6 +245,28 @@ export default function CreateContentPage() {
     }
   }
 
+  async function handlePublish(postId, platform) {
+    setIsPublishing(true);
+
+    try {
+      const result = await publishPost(postId, platform);
+      setPostStatus("posted");
+      setPublishStatus({
+        postId,
+        platformPostId: result.data.platformPostId,
+        publishedAt: result.data.publishedAt,
+        publishError: null,
+      });
+    } catch (err) {
+      setPublishStatus((prev) => ({
+        ...prev,
+        publishError: err.message || "Publish failed",
+      }));
+    } finally {
+      setIsPublishing(false);
+    }
+  }
+
   async function onSaveDraft() {
     if (!output) {
       setSaveStatus({
@@ -353,6 +386,10 @@ export default function CreateContentPage() {
         onRewrite={onRewrite}
         onSaveDraft={onSaveDraft}
         saveLabel={currentDraftId ? "Save Draft Changes" : "Save Draft"}
+        publishStatus={currentDraftId ? publishStatus : null}
+        onPublish={handlePublish}
+        isPublishing={isPublishing}
+        postStatus={postStatus}
       />
     </div>
   );
