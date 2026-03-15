@@ -16,7 +16,7 @@ export default function Sidebar() {
         />
       </div>
 
-      <nav className="grid flex-1 grid-cols-1 gap-2 lg:space-y-2">
+      <nav className="grid grid-cols-1 gap-1 lg:gap-0 lg:space-y-1">
         {navigationLinks.map((link) => (
           <NavLink
             key={link.to}
@@ -36,6 +36,7 @@ export default function Sidebar() {
         ))}
       </nav>
 
+      <div className="flex-1" />
       {user && (
         <div className="mt-4 border-t border-[var(--border)] pt-4">
           <p className="mb-2 truncate text-xs text-[var(--muted)]">{user.email}</p>
