@@ -5,6 +5,8 @@ import LoadingState from "../ui/LoadingState";
 import Textarea from "../ui/Textarea";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
+import PostPreview from "./PostPreview";
+import QuoteCard from "./QuoteCard";
 import { AI_TONE_ACTIONS } from "../../lib/aiGeneration";
 
 export default function GeneratedOutput({
@@ -17,6 +19,8 @@ export default function GeneratedOutput({
   isSaving,
   isRewriting,
   activeRewriteAction,
+  platform = "Instagram",
+  contentType = "Caption Post",
   onChange,
   onRetryGenerate,
   onRewrite,
@@ -84,6 +88,9 @@ export default function GeneratedOutput({
           {saveStatus.message}
         </div>
       ) : null}
+
+      <PostPreview output={output} platform={platform} contentType={contentType} />
+      <QuoteCard output={output} platform={platform} />
 
       <div className="mb-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
         {AI_TONE_ACTIONS.map((action) => (

@@ -346,6 +346,8 @@ export default function CreateContentPage() {
         fieldErrors={outputErrors}
         saveStatus={saveStatus}
         isSaving={isSaving}
+        platform={form.platform}
+        contentType={form.contentType}
         onChange={onOutputChange}
         onRetryGenerate={onGenerate}
         onRewrite={onRewrite}
