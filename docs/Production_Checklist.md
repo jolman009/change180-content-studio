@@ -3,31 +3,31 @@
 ## Phase 1: Security Foundation
 _Must-have before any real users. Auth gates everything else._
 
-- [ ] **1. Authentication (Supabase Auth)**
-  - [ ] Enable Supabase Auth (email/password or magic link)
-  - [ ] Create login/signup pages
-  - [ ] Add auth context provider wrapping the app
-  - [ ] Protect all routes with auth guard (redirect to login if unauthenticated)
-  - [ ] Pass user JWT to Supabase client and Edge Function calls
-  - [ ] Add logout button to Sidebar/Topbar
-  - [ ] Test: unauthenticated user cannot access app routes
-  - [ ] Test: authenticated user can access all features
+- [x] **1. Authentication (Supabase Auth)**
+  - [x] Enable Supabase Auth (email/password or magic link)
+  - [x] Create login/signup pages
+  - [x] Add auth context provider wrapping the app
+  - [x] Protect all routes with auth guard (redirect to login if unauthenticated)
+  - [x] Pass user JWT to Supabase client and Edge Function calls
+  - [x] Add logout button to Sidebar/Topbar
+  - [x] Test: unauthenticated user cannot access app routes
+  - [x] Test: authenticated user can access all features
 
-- [ ] **3. Row-Level Security (RLS)**
-  - [ ] Enable RLS on `brand_profiles` table
-  - [ ] Enable RLS on `content_posts` table
-  - [ ] Enable RLS on `performance_logs` table
-  - [ ] Write policies: users can only read/write their own rows
-  - [ ] Re-enable JWT verification on Edge Function
-  - [ ] Test: user A cannot see user B's data
-  - [ ] Test: unauthenticated requests are rejected (401)
+- [x] **3. Row-Level Security (RLS)**
+  - [x] Enable RLS on `brand_profiles` table
+  - [x] Enable RLS on `content_posts` table
+  - [x] Enable RLS on `performance_logs` table
+  - [x] Write policies: users can only read/write their own rows
+  - [x] Re-enable JWT verification on Edge Function
+  - [x] Test: user A cannot see user B's data
+  - [x] Test: unauthenticated requests are rejected (401)
 
 ## Phase 2: Data Integrity
 _Lock down the schema and validate what flows through the system._
 
 - [ ] **2. Supabase Schema in Repo**
   - [ ] Run `supabase db diff` to capture current schema
-  - [ ] Save migration files to `supabase/migrations/`
+  - [x] Save migration files to `supabase/migrations/`
   - [ ] Add seed file (`supabase/seed.sql`) for demo data
   - [ ] Document migration workflow in README
   - [ ] Verify migrations run clean on a fresh Supabase project
@@ -92,7 +92,7 @@ _Nice to have for a professional feel. Lower priority for internal tool._
 
 | Phase | Focus | Items | Priority |
 |-------|-------|-------|----------|
-| 1 | Security Foundation | Auth + RLS | Critical |
+| 1 | Security Foundation | Auth + RLS | Done |
 | 2 | Data Integrity | Schema migrations + Validation | High |
 | 3 | Testing & Reliability | E2E tests + Error monitoring | High |
 | 4 | Production Safeguards | Rate limiting + Backups | Medium |

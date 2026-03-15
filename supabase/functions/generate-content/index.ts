@@ -218,6 +218,12 @@ Deno.serve(async (request) => {
     return jsonResponse({ message: "Method not allowed." }, 405);
   }
 
+  // Verify JWT — reject unauthenticated requests
+  const authHeader = request.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return jsonResponse({ message: "Missing authorization token." }, 401);
+  }
+
   try {
     const body = (await request.json()) as GenerateContentRequest;
 
