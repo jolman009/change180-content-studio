@@ -38,3 +38,9 @@ policy = "per_worker"
 
 [functions.generate-content]
 verify_jwt = false
+
+[functions.linkedin-oauth]
+verify_jwt = true
+
+[functions.linkedin-publish]
+verify_jwt = true

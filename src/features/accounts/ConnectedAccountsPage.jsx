@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import Card from "../../components/ui/Card";
 import ErrorState from "../../components/ui/ErrorState";
 import LoadingState from "../../components/ui/LoadingState";
@@ -9,8 +10,10 @@ import {
   disconnectPlatform,
 } from "../../services/platformService";
 import { hasSupabaseEnv } from "../../lib/runtime";
+import { buildLinkedInAuthUrl } from "../../lib/linkedinOAuth";
 
 export default function ConnectedAccountsPage() {
+  const location = useLocation();
   const [credentials, setCredentials] = useState([]);
   const [status, setStatus] = useState({ type: "", message: "" });
   const [isLoading, setIsLoading] = useState(true);
@@ -45,8 +48,30 @@ export default function ConnectedAccountsPage() {
     loadCredentials();
   }, []);
 
+  // Check for OAuth callback status passed via navigation state
+  useEffect(() => {
+    if (location.state?.status) {
+      setStatus(location.state.status);
+      loadCredentials();
+      // Clear navigation state so it doesn't persist on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
+
   async function handleConnect(platform) {
     setStatus({ type: "", message: "" });
+
+    if (hasSupabaseEnv && platform === "LinkedIn") {
+      try {
+        window.location.href = buildLinkedInAuthUrl();
+      } catch (error) {
+        setStatus({
+          type: "error",
+          message: error.message || "Unable to start LinkedIn OAuth.",
+        });
+      }
+      return;
+    }
 
     if (hasSupabaseEnv) {
       setStatus({
