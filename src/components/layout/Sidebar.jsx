@@ -5,8 +5,11 @@ export default function Sidebar() {
   return (
     <aside className="hidden border-b border-[var(--border)] bg-white p-3 sm:p-4 lg:block lg:w-72 lg:border-b-0 lg:border-r lg:p-5">
       <div className="mb-4 lg:mb-8">
-        <h1 className="text-2xl font-bold text-[var(--primary)]">Change180</h1>
-        <p className="text-sm text-gray-500">Content Studio</p>
+        <img
+          src="/change180_logo.webp"
+          alt="Change180 Life Coaching"
+          className="mx-auto h-24 w-auto lg:mx-0"
+        />
       </div>
 
       <nav className="grid grid-cols-1 gap-2 lg:space-y-2">

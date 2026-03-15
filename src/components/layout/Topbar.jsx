@@ -38,7 +38,7 @@ export default function Topbar() {
     <header className="border-b border-[var(--border)] bg-white px-3 py-3 sm:px-6 sm:py-4">
       <div className="flex items-start justify-between gap-3 xl:items-start">
         <div className="min-w-0">
-          <h2 className="text-sm font-semibold sm:text-lg">Change180 Content Studio</h2>
+          <h2 className="text-sm font-semibold text-[var(--secondary)] sm:text-lg">Change180 <span className="text-[var(--accent)]">Content Studio</span></h2>
           <p className="mt-1 text-xs text-gray-500 sm:text-sm">
             Create, organize, and refine coaching content.
           </p>
