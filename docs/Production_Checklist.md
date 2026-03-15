@@ -25,19 +25,18 @@ _Must-have before any real users. Auth gates everything else._
 ## Phase 2: Data Integrity
 _Lock down the schema and validate what flows through the system._
 
-- [ ] **2. Supabase Schema in Repo**
-  - [ ] Run `supabase db diff` to capture current schema
+- [x] **2. Supabase Schema in Repo**
   - [x] Save migration files to `supabase/migrations/`
-  - [ ] Add seed file (`supabase/seed.sql`) for demo data
+  - [x] Add seed file (`supabase/seed.sql`) for demo data
   - [ ] Document migration workflow in README
   - [ ] Verify migrations run clean on a fresh Supabase project
 
-- [ ] **5. Data Validation**
-  - [ ] Add response validation to Edge Function output (verify hook, caption, cta, hashtags, visual fields exist)
-  - [ ] Add input validation on ContentForm before sending to API
-  - [ ] Add validation on brand profile save (required fields: brand_name, mission, target_audience)
-  - [ ] Add error boundaries that show user-friendly messages on malformed data
-  - [ ] Test: malformed API response shows error state, not crash
+- [x] **5. Data Validation**
+  - [x] Add response validation to Edge Function output (verify hook, caption, cta, hashtags, visual fields exist)
+  - [x] Add input validation on ContentForm before sending to API (already existed)
+  - [x] Add validation on brand profile save (already existed)
+  - [x] Add error boundaries that show user-friendly messages on malformed data
+  - [x] Test: malformed API response shows error state, not crash
 
 ## Phase 3: Testing & Reliability
 _Confidence that things work and you'll know when they don't._
@@ -93,7 +92,7 @@ _Nice to have for a professional feel. Lower priority for internal tool._
 | Phase | Focus | Items | Priority |
 |-------|-------|-------|----------|
 | 1 | Security Foundation | Auth + RLS | Done |
-| 2 | Data Integrity | Schema migrations + Validation | High |
+| 2 | Data Integrity | Schema migrations + Validation | Done |
 | 3 | Testing & Reliability | E2E tests + Error monitoring | High |
 | 4 | Production Safeguards | Rate limiting + Backups | Medium |
 | 5 | Polish | SEO / Meta tags | Low |

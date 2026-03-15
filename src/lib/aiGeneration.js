@@ -49,7 +49,20 @@ export function buildRewriteContentRequest(input, output, actionId, brandProfile
 }
 
 export function normalizeGenerateContentResponse(response) {
-  return normalizeGeneratedContent(response?.output ?? response);
+  const output = response?.output ?? response;
+
+  if (!output || typeof output !== "object") {
+    throw new Error("AI response was empty or invalid.");
+  }
+
+  const required = ["hook", "caption", "cta"];
+  const missing = required.filter((field) => !output[field] || typeof output[field] !== "string");
+
+  if (missing.length > 0) {
+    throw new Error(`AI response missing required fields: ${missing.join(", ")}`);
+  }
+
+  return normalizeGeneratedContent(output);
 }
 
 function shortenSentence(value, maxLength) {
