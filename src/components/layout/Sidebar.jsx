@@ -1,9 +1,13 @@
 import { NavLink } from "react-router-dom";
+import { LogOut } from "lucide-react";
 import { navigationLinks } from "./navigation";
+import { useAuth } from "../../lib/authContext";
 
 export default function Sidebar() {
+  const { user, signOut } = useAuth();
+
   return (
-    <aside className="hidden border-b border-[var(--border)] bg-white p-3 sm:p-4 lg:block lg:w-72 lg:border-b-0 lg:border-r lg:p-5">
+    <aside className="hidden border-b border-[var(--border)] bg-white p-3 sm:p-4 lg:flex lg:w-72 lg:flex-col lg:border-b-0 lg:border-r lg:p-5">
       <div className="mb-4 lg:mb-8">
         <img
           src="/change180_logo.webp"
@@ -12,7 +16,7 @@ export default function Sidebar() {
         />
       </div>
 
-      <nav className="grid grid-cols-1 gap-2 lg:space-y-2">
+      <nav className="grid flex-1 grid-cols-1 gap-2 lg:space-y-2">
         {navigationLinks.map((link) => (
           <NavLink
             key={link.to}
@@ -31,6 +35,19 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </nav>
+
+      {user && (
+        <div className="mt-4 border-t border-[var(--border)] pt-4">
+          <p className="mb-2 truncate text-xs text-[var(--muted)]">{user.email}</p>
+          <button
+            onClick={signOut}
+            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-[var(--text)] transition hover:bg-[var(--bg)]"
+          >
+            <LogOut size={18} />
+            <span>Sign Out</span>
+          </button>
+        </div>
+      )}
     </aside>
   );
 }

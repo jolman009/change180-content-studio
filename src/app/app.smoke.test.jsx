@@ -2,6 +2,7 @@ import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { RouterProvider, createMemoryRouter } from "react-router-dom";
+import { AuthProvider } from "../lib/authContext";
 import App from "../App";
 import DashboardPage from "../features/dashboard/DashboardPage";
 import CreateContentPage from "../features/content/CreateContentPage";
@@ -41,7 +42,11 @@ function renderRoute(initialEntry = "/") {
     { initialEntries: [initialEntry] },
   );
 
-  return render(<RouterProvider router={router} />);
+  return render(
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
+  );
 }
 
 describe("app smoke routes", () => {

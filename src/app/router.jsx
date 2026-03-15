@@ -2,6 +2,8 @@ import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
 import NotFoundPage from "../features/app/NotFoundPage";
 import RouteErrorPage from "../features/app/RouteErrorPage";
+import LoginPage from "../features/auth/LoginPage";
+import ProtectedRoute from "../components/auth/ProtectedRoute";
 import AnalyticsNotesPage from "../features/analytics/AnalyticsNotesPage";
 import BrandProfilePage from "../features/brand/BrandProfilePage";
 import CreateContentPage from "../features/content/CreateContentPage";
@@ -11,8 +13,16 @@ import NextMovesPage from "../features/strategy/NextMovesPage";
 
 export const router = createBrowserRouter([
   {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
     path: "/",
-    element: <App />,
+    element: (
+      <ProtectedRoute>
+        <App />
+      </ProtectedRoute>
+    ),
     errorElement: <RouteErrorPage />,
     children: [
       { index: true, element: <DashboardPage /> },
