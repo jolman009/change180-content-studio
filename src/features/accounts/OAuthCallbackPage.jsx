@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { validateOAuthState, getOAuthRedirectUri } from "../../lib/linkedinOAuth";
+import { validateMetaOAuthState, getOAuthPlatform, getOAuthRedirectUri as getMetaRedirectUri } from "../../lib/metaOAuth";
 import { apiPost } from "../../lib/api";
 
 export default function OAuthCallbackPage() {
@@ -25,6 +26,38 @@ export default function OAuthCallbackPage() {
         return;
       }
 
+      // Detect platform from sessionStorage
+      const metaPlatform = getOAuthPlatform();
+      const isMeta = metaPlatform === "Facebook" || metaPlatform === "Instagram";
+
+      if (isMeta) {
+        if (!validateMetaOAuthState(state)) {
+          setError("Invalid OAuth state. Please try connecting again.");
+          return;
+        }
+
+        try {
+          const result = await apiPost("/meta-oauth", {
+            code,
+            redirectUri: getMetaRedirectUri(),
+          });
+
+          let message = `Facebook connected as ${result.facebook.platformUsername}.`;
+          if (result.instagram) {
+            message += ` Instagram also connected as ${result.instagram.platformUsername}.`;
+          }
+
+          navigate("/accounts", {
+            state: { status: { type: "success", message } },
+            replace: true,
+          });
+        } catch (err) {
+          setError(err.message || "Failed to exchange authorization code.");
+        }
+        return;
+      }
+
+      // Default: LinkedIn
       if (!validateOAuthState(state)) {
         setError("Invalid OAuth state. Please try connecting again.");
         return;
@@ -76,7 +109,7 @@ export default function OAuthCallbackPage() {
     <div className="flex min-h-[60vh] items-center justify-center">
       <div className="text-center">
         <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-sky-200 border-t-sky-600" />
-        <p className="text-sm text-gray-600">Connecting your LinkedIn account...</p>
+        <p className="text-sm text-gray-600">Connecting your account...</p>
       </div>
     </div>
   );

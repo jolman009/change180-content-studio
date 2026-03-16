@@ -9,6 +9,12 @@ export async function publishPost(postId, platform) {
     return { data: result.post, source: "supabase" };
   }
 
+  // Real Facebook publishing when Supabase + API are configured
+  if (hasSupabaseEnv && hasApiBaseUrl && platform === "Facebook") {
+    const result = await apiPost("/facebook-publish", { postId });
+    return { data: result.post, source: "supabase" };
+  }
+
   // Mock publishing for all other cases
   await new Promise((resolve) => setTimeout(resolve, 1000));
 

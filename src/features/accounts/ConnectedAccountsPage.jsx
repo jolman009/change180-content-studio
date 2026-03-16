@@ -11,6 +11,7 @@ import {
 } from "../../services/platformService";
 import { hasSupabaseEnv } from "../../lib/runtime";
 import { buildLinkedInAuthUrl } from "../../lib/linkedinOAuth";
+import { buildMetaAuthUrl } from "../../lib/metaOAuth";
 
 export default function ConnectedAccountsPage() {
   const location = useLocation();
@@ -68,6 +69,18 @@ export default function ConnectedAccountsPage() {
         setStatus({
           type: "error",
           message: error.message || "Unable to start LinkedIn OAuth.",
+        });
+      }
+      return;
+    }
+
+    if (hasSupabaseEnv && (platform === "Facebook" || platform === "Instagram")) {
+      try {
+        window.location.href = buildMetaAuthUrl(platform);
+      } catch (error) {
+        setStatus({
+          type: "error",
+          message: error.message || "Unable to start Meta OAuth.",
         });
       }
       return;

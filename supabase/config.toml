@@ -44,3 +44,9 @@ verify_jwt = false
 
 [functions.linkedin-publish]
 verify_jwt = false
+
+[functions.meta-oauth]
+verify_jwt = false
+
+[functions.facebook-publish]
+verify_jwt = false
