@@ -1,4 +1,4 @@
-const LINKEDIN_SCOPES = "openid profile w_member_social";
+const LINKEDIN_SCOPES = "openid profile w_member_social w_organization_social";
 const STATE_KEY = "change180.linkedinOAuthState";
 
 export function getOAuthRedirectUri() {

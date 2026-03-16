@@ -100,17 +100,22 @@ Deno.serve(async (request) => {
     }
     const commentary = parts.join("\n\n");
 
-    // Publish to LinkedIn
+    // Publish to LinkedIn (organization page)
+    const orgId = Deno.env.get("LINKEDIN_ORG_ID");
+    const author = orgId
+      ? `urn:li:organization:${orgId}`
+      : `urn:li:person:${credential.platform_user_id}`;
+
     const linkedInResponse = await fetch(LINKEDIN_POSTS_URL, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${credential.access_token}`,
         "Content-Type": "application/json",
-        "LinkedIn-Version": "202401",
+        "LinkedIn-Version": "202601",
         "X-Restli-Protocol-Version": "2.0.0",
       },
       body: JSON.stringify({
-        author: `urn:li:person:${credential.platform_user_id}`,
+        author,
         commentary,
         visibility: "PUBLIC",
         distribution: {
