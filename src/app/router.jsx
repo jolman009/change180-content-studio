@@ -12,11 +12,16 @@ import ConnectedAccountsPage from "../features/accounts/ConnectedAccountsPage";
 import OAuthCallbackPage from "../features/accounts/OAuthCallbackPage";
 import DashboardPage from "../features/dashboard/DashboardPage";
 import NextMovesPage from "../features/strategy/NextMovesPage";
+import PrivacyPolicyPage from "../features/app/PrivacyPolicyPage";
 
 export const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
+  },
+  {
+    path: "/privacy-policy",
+    element: <PrivacyPolicyPage />,
   },
   {
     path: "/",
