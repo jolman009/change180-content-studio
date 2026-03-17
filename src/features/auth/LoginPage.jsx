@@ -159,6 +159,12 @@ export default function LoginPage() {
             </p>
           </form>
         )}
+
+        <p className="mt-6 text-center text-xs text-[var(--muted)]">
+          <a href="/privacy-policy" className="hover:underline">Privacy Policy</a>
+          <span className="mx-2">·</span>
+          <a href="/data-deletion" className="hover:underline">Data Deletion</a>
+        </p>
       </div>
     </div>
   );

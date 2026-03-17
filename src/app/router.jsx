@@ -13,6 +13,7 @@ import OAuthCallbackPage from "../features/accounts/OAuthCallbackPage";
 import DashboardPage from "../features/dashboard/DashboardPage";
 import NextMovesPage from "../features/strategy/NextMovesPage";
 import PrivacyPolicyPage from "../features/app/PrivacyPolicyPage";
+import DataDeletionPage from "../features/app/DataDeletionPage";
 
 export const router = createBrowserRouter([
   {
@@ -22,6 +23,10 @@ export const router = createBrowserRouter([
   {
     path: "/privacy-policy",
     element: <PrivacyPolicyPage />,
+  },
+  {
+    path: "/data-deletion",
+    element: <DataDeletionPage />,
   },
   {
     path: "/",

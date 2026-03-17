@@ -67,7 +67,7 @@ export default function PrivacyPolicyPage() {
           <ul className="ml-6 list-disc space-y-1">
             <li>Disconnect any social media account from the App, which deletes stored credentials</li>
             <li>Revoke the App's access directly from your Facebook, Instagram, or LinkedIn account settings</li>
-            <li>Request deletion of all your data by contacting us</li>
+            <li>Request deletion of all your data — see our <a href="/data-deletion" className="text-sky-600 hover:underline">Data Deletion Instructions</a></li>
           </ul>
         </section>
 
