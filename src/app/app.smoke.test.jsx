@@ -1,5 +1,13 @@
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("sonner", () => ({
+  toast: Object.assign(() => {}, {
+    success: () => {},
+    error: () => {},
+    info: () => {},
+  }),
+}));
 import { render, screen } from "@testing-library/react";
 import { RouterProvider, createMemoryRouter } from "react-router-dom";
 import { AuthProvider } from "../lib/authContext";

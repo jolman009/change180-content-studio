@@ -82,7 +82,7 @@ Deno.serve(async (request) => {
     // Get content post
     const { data: post, error: postError } = await supabaseAdmin
       .from("content_posts")
-      .select("hook, body, cta, hashtags")
+      .select("hook, body, cta, hashtags, media_url")
       .eq("id", postId)
       .eq("user_id", user.id)
       .single();
@@ -101,18 +101,24 @@ Deno.serve(async (request) => {
     }
     const message = enforceCharLimit(parts.join("\n\n"), "Facebook");
 
-    // Publish to Facebook Page
-    const fbResponse = await fetch(
-      `${GRAPH_BASE}/${credential.platform_user_id}/feed`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message,
-          access_token: credential.access_token,
-        }),
-      },
-    );
+    // Publish to Facebook Page — use /photos endpoint if image attached, /feed otherwise
+    const endpoint = post.media_url
+      ? `${GRAPH_BASE}/${credential.platform_user_id}/photos`
+      : `${GRAPH_BASE}/${credential.platform_user_id}/feed`;
+
+    const postBody: Record<string, string> = {
+      message,
+      access_token: credential.access_token,
+    };
+    if (post.media_url) {
+      postBody.url = post.media_url;
+    }
+
+    const fbResponse = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(postBody),
+    });
 
     const fbResult = await fbResponse.json();
 

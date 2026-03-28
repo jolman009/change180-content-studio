@@ -19,6 +19,7 @@ import { getBrandProfile } from "../../services/brandService";
 import { generateContent, rewriteGeneratedContent } from "../../services/aiService";
 import { getContentPostById, saveContentPost, updateContentPost } from "../../services/contentService";
 import { publishPost } from "../../services/publishService";
+import { uploadMedia } from "../../services/mediaService";
 
 export default function CreateContentPage() {
   const { draftId } = useParams();
@@ -38,6 +39,10 @@ export default function CreateContentPage() {
   const [publishStatus, setPublishStatus] = useState(null);
   const [isPublishing, setIsPublishing] = useState(false);
   const [postStatus, setPostStatus] = useState("draft");
+  const [mediaPreviewUrl, setMediaPreviewUrl] = useState(null);
+  const [mediaUrl, setMediaUrl] = useState(null);
+  const [mediaType, setMediaType] = useState(null);
+  const [isUploadingMedia, setIsUploadingMedia] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -85,7 +90,13 @@ export default function CreateContentPage() {
 
         setCurrentDraftId(result.data.id ?? draftId);
         setForm(getDraftInputFromContentPost(result.data));
-        setOutput(getGeneratedContentFromContentPost(result.data));
+        const loadedOutput = getGeneratedContentFromContentPost(result.data);
+        setOutput(loadedOutput);
+        if (loadedOutput.mediaUrl) {
+          setMediaUrl(loadedOutput.mediaUrl);
+          setMediaType(loadedOutput.mediaType);
+          setMediaPreviewUrl(loadedOutput.mediaUrl);
+        }
         setPostStatus(result.data.status || "draft");
         setPublishStatus({
           postId: result.data.id ?? draftId,
@@ -172,6 +183,27 @@ export default function CreateContentPage() {
     });
   }
 
+  async function handleMediaSelect(file) {
+    setIsUploadingMedia(true);
+    try {
+      const result = await uploadMedia(file);
+      setMediaUrl(result.url);
+      setMediaType(result.type);
+      setMediaPreviewUrl(result.url);
+      toast.success("Image uploaded.");
+    } catch (err) {
+      toast.error(err.message || "Failed to upload image.");
+    } finally {
+      setIsUploadingMedia(false);
+    }
+  }
+
+  function handleMediaRemove() {
+    setMediaUrl(null);
+    setMediaType(null);
+    setMediaPreviewUrl(null);
+  }
+
   async function onGenerate() {
     const nextErrors = validateContentDraftInput(form);
 
@@ -189,7 +221,13 @@ export default function CreateContentPage() {
 
     try {
       const generated = await generateContent(form, brandProfile);
-      setOutput(normalizeGeneratedContent(generated));
+      const normalizedOutput = normalizeGeneratedContent(generated);
+      // Preserve media attachment across regeneration
+      if (mediaUrl) {
+        normalizedOutput.mediaUrl = mediaUrl;
+        normalizedOutput.mediaType = mediaType;
+      }
+      setOutput(normalizedOutput);
       toast.success("Draft generated with current brand context.");
     } catch (err) {
       setOutput(null);
@@ -265,6 +303,9 @@ export default function CreateContentPage() {
 
     try {
       const draft = createContentPost(form, output);
+      // Attach media to draft
+      draft.mediaUrl = mediaUrl;
+      draft.mediaType = mediaType;
       const result = currentDraftId
         ? await updateContentPost(currentDraftId, draft)
         : await saveContentPost(draft);
@@ -330,6 +371,10 @@ export default function CreateContentPage() {
           fieldErrors={fieldErrors}
           onChange={onChange}
           onGenerate={onGenerate}
+          onMediaSelect={handleMediaSelect}
+          onMediaRemove={handleMediaRemove}
+          mediaPreviewUrl={mediaPreviewUrl}
+          isUploadingMedia={isUploadingMedia}
           loading={loading}
           error={generateError}
         />

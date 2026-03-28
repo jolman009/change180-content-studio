@@ -66,34 +66,32 @@ Stabilize the app before adding features. Focus on testing, validation, UX feedb
 
 Address missing functionality that users expect from a content studio.
 
-### 2.1 OAuth Token Refresh
-- [ ] Store `refresh_token` in `platform_credentials` for LinkedIn (update `linkedin-oauth`)
-- [ ] Implement token refresh logic in `linkedin-publish` edge function before 401 rejection
-- [ ] Exchange long-lived page tokens in `meta-oauth` (Facebook page tokens can be made permanent)
-- [ ] Add "Token expiring soon" warning in `ConnectedAccountsPage` (e.g., <7 days remaining)
-- [ ] Add a "Refresh Connection" button as alternative to full re-auth
+### 2.1 OAuth Token Refresh ✅ COMPLETED
+- [x] Store `refresh_token` in LinkedIn OAuth (was discarded, now saved)
+- [x] Implement `refreshLinkedInToken()` in `linkedin-publish` — attempts silent refresh before rejecting expired tokens
+- [x] Store long-lived user access token as `refresh_token` in Meta OAuth for both Facebook and Instagram
+- [x] Add "Token expiring soon" / "Token expired" warnings in `PlatformConnectionList` (<=7 days = amber, expired = red)
+- [x] Add "Refresh" button that re-initiates OAuth flow for platforms with expiring tokens
 
-### 2.2 Scheduled Auto-Publishing
-- [ ] Create a new edge function `scheduled-publish/index.ts` that:
-  - Queries `content_posts` where `status = 'scheduled'` and `scheduled_for <= now()`
-  - Publishes each post via the appropriate platform publish function
-  - Updates status to `posted` or sets `publish_error`
-- [ ] Set up a Supabase cron job (via `pg_cron` or external scheduler) to invoke the function every 5 minutes
-- [ ] Add a "Schedule" button in CalendarPage that sets status to `scheduled` (distinct from `approved`)
-- [ ] Show scheduled posts with a clock icon and countdown in CalendarBoard
-- [ ] Add status filter for "scheduled" in calendar filters
-- [ ] Handle edge case: post scheduled but no platform credential connected
+### 2.2 Scheduled Auto-Publishing ✅ COMPLETED
+- [x] Created `scheduled-publish/index.ts` edge function — queries due posts, publishes to LinkedIn/Facebook, updates status
+- [x] Edge function handles per-post errors gracefully (sets `publish_error`, doesn't stop batch)
+- [x] Added "Schedule for Auto-Publish" button in CalendarBoard for approved posts with a date
+- [x] Scheduled posts shown with sky-blue styling, clock icon, and countdown ("Tomorrow", "In X days", "Due now")
+- [x] `"scheduled"` already existed in `POST_STATUSES` — status filter works out of the box
+- [x] Handles missing credentials per-post (sets error, continues batch)
+- [ ] Set up Supabase cron job to invoke the function periodically *(requires Supabase dashboard config)*
 
-### 2.3 Media/Image Upload Support
-- [ ] Create a Supabase Storage bucket `post-media` for user uploads
-- [ ] Add an image upload input to `ContentForm.jsx` (accept jpg, png, gif, webp; max 5MB)
-- [ ] Add `media_url` and `media_type` fields to `content_posts` table and data model
-- [ ] Update `contentDraft.js` mapper to handle the new media fields
-- [ ] Upload files to Supabase Storage from `contentService.js`
-- [ ] Display uploaded image preview in `GeneratedOutput.jsx` and `PostPreview.jsx`
-- [ ] Update `linkedin-publish` to attach image via LinkedIn Image API
-- [ ] Update `facebook-publish` to attach image via Graph API photo endpoint
-- [ ] Add image preview in `CalendarBoard` post cards
+### 2.3 Media/Image Upload Support ✅ COMPLETED
+- [x] Created `mediaService.js` with `uploadMedia()` and `validateMediaFile()` — Supabase Storage with localStorage fallback
+- [x] Added image upload input to `ContentForm.jsx` (accept jpg/png/gif/webp, max 5MB, preview + remove)
+- [x] Added `media_url` and `media_type` fields to data model (`contentDraft.js` mappers, `contentService.js` SELECT)
+- [x] Media persists across regeneration and draft save/load
+- [x] `PostPreview.jsx` shows uploaded image instead of gradient placeholder
+- [x] `linkedin-publish` attaches image via `content.article.source` field
+- [x] `facebook-publish` uses `/photos` endpoint with `url` param when image attached
+- [x] `CalendarBoard` shows 16x16 image thumbnail on post cards
+- [ ] Create Supabase Storage bucket `post-media` *(requires Supabase dashboard config)*
 
 ---
 

@@ -1,3 +1,5 @@
+import { useRef } from "react";
+import { ImagePlus, X } from "lucide-react";
 import Input from "../ui/Input";
 import Select from "../ui/Select";
 import Textarea from "../ui/Textarea";
@@ -15,10 +17,26 @@ export default function ContentForm({
   fieldErrors,
   onChange,
   onGenerate,
+  onMediaSelect,
+  onMediaRemove,
+  mediaPreviewUrl,
+  isUploadingMedia,
   loading,
   error,
 }) {
+  const fileInputRef = useRef(null);
   const availableContentTypes = getAvailableContentTypes(form.platform);
+
+  function handleFileChange(e) {
+    const file = e.target.files?.[0];
+    if (file && onMediaSelect) {
+      onMediaSelect(file);
+    }
+    // Reset input so the same file can be re-selected
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -76,6 +94,49 @@ export default function ContentForm({
         onChange={onChange}
         placeholder="Ex: this post should feel grounded, hopeful, and invite coaching inquiry."
       />
+
+      {/* Image upload */}
+      <div>
+        <label className="mb-1.5 block text-sm font-medium text-[var(--text)]">
+          Image (optional)
+        </label>
+        {mediaPreviewUrl ? (
+          <div className="relative inline-block">
+            <img
+              src={mediaPreviewUrl}
+              alt="Upload preview"
+              className="h-32 w-32 rounded-xl border border-[var(--border)] object-cover"
+            />
+            {onMediaRemove ? (
+              <button
+                type="button"
+                onClick={onMediaRemove}
+                className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white shadow-sm transition hover:bg-red-600"
+                aria-label="Remove image"
+              >
+                <X size={14} />
+              </button>
+            ) : null}
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploadingMedia}
+            className="flex items-center gap-2 rounded-xl border border-dashed border-[var(--border)] px-4 py-3 text-sm text-gray-500 transition hover:border-[var(--primary)] hover:text-[var(--primary)]"
+          >
+            <ImagePlus size={18} />
+            {isUploadingMedia ? "Uploading..." : "Attach image"}
+          </button>
+        )}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/gif,image/webp"
+          onChange={handleFileChange}
+          className="hidden"
+        />
+      </div>
 
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
 

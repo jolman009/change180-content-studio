@@ -1,11 +1,25 @@
 import { PLATFORMS } from "../../lib/constants";
 import Button from "../ui/Button";
 
+function getExpiryStatus(credential) {
+  if (!credential?.tokenExpiresAt) return null;
+
+  const expiresAt = new Date(credential.tokenExpiresAt);
+  const now = new Date();
+  const daysLeft = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
+
+  if (daysLeft <= 0) return { level: "expired", label: "Token expired" };
+  if (daysLeft <= 7) return { level: "warning", label: `Expires in ${daysLeft}d` };
+  return null;
+}
+
 export default function PlatformConnectionList({
   connectedPlatforms = [],
   onConnect,
   onDisconnect,
+  onRefresh,
   disconnectingPlatform,
+  refreshingPlatform,
 }) {
   function getCredential(platform) {
     return connectedPlatforms.find((c) => c.platform === platform);
@@ -15,6 +29,7 @@ export default function PlatformConnectionList({
     <div className="space-y-3">
       {PLATFORMS.map((platform) => {
         const credential = getCredential(platform);
+        const expiry = getExpiryStatus(credential);
 
         return (
           <div
@@ -40,13 +55,34 @@ export default function PlatformConnectionList({
                       })}
                     </span>
                   ) : null}
+                  {expiry ? (
+                    <span
+                      className={
+                        expiry.level === "expired"
+                          ? "font-medium text-red-600"
+                          : "font-medium text-amber-600"
+                      }
+                    >
+                      &middot; {expiry.label}
+                    </span>
+                  ) : null}
                 </div>
               ) : (
                 <p className="mt-1 text-sm text-gray-400">Not connected</p>
               )}
             </div>
 
-            <div className="flex-shrink-0">
+            <div className="flex shrink-0 gap-2">
+              {credential && expiry && onRefresh ? (
+                <Button
+                  variant="ghost"
+                  onClick={() => onRefresh(platform)}
+                  disabled={refreshingPlatform === platform}
+                  className="w-full text-sm sm:w-auto"
+                >
+                  {refreshingPlatform === platform ? "Refreshing..." : "Refresh"}
+                </Button>
+              ) : null}
               {credential ? (
                 <Button
                   variant="ghost"

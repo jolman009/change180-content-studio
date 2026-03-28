@@ -18,7 +18,7 @@ export const CONTENT_DRAFT_FIELDS = [
   "context",
 ];
 
-export const GENERATED_CONTENT_FIELDS = ["hook", "caption", "cta", "hashtags", "visual"];
+export const GENERATED_CONTENT_FIELDS = ["hook", "caption", "cta", "hashtags", "visual", "mediaUrl", "mediaType"];
 
 export const CONTENT_FIELD_LABELS = {
   topic: "Topic",
@@ -183,6 +183,8 @@ export function createContentPost(input, generatedContent) {
     cta: normalizedOutput.cta,
     hashtags: normalizedOutput.hashtags,
     visualDirection: normalizedOutput.visual,
+    mediaUrl: normalizedOutput.mediaUrl || null,
+    mediaType: normalizedOutput.mediaType || null,
   };
 }
 
@@ -201,6 +203,8 @@ export function toContentPostRecord(post) {
     cta: post.cta,
     hashtags: post.hashtags,
     visual_direction: post.visualDirection,
+    media_url: post.mediaUrl ?? null,
+    media_type: post.mediaType ?? null,
     scheduled_for: normalizeOptionalDate(post.scheduledFor),
     platform_post_id: post.platformPostId ?? null,
     published_at: post.publishedAt ?? null,
@@ -224,6 +228,8 @@ export function toContentPostUpdate(updates) {
   if ("cta" in updates) updateRecord.cta = updates.cta;
   if ("hashtags" in updates) updateRecord.hashtags = updates.hashtags;
   if ("visualDirection" in updates) updateRecord.visual_direction = updates.visualDirection;
+  if ("mediaUrl" in updates) updateRecord.media_url = updates.mediaUrl ?? null;
+  if ("mediaType" in updates) updateRecord.media_type = updates.mediaType ?? null;
   if ("scheduledFor" in updates) updateRecord.scheduled_for = normalizeOptionalDate(updates.scheduledFor);
   if ("platformPostId" in updates) updateRecord.platform_post_id = updates.platformPostId ?? null;
   if ("publishedAt" in updates) updateRecord.published_at = updates.publishedAt ?? null;
@@ -248,6 +254,8 @@ export function fromContentPostRecord(record = {}) {
     cta: normalizeString(record.cta, ""),
     hashtags: normalizeHashtags(record.hashtags ?? []),
     visualDirection: normalizeString(record.visual_direction, ""),
+    mediaUrl: record.media_url ?? null,
+    mediaType: record.media_type ?? null,
     createdAt: normalizeString(record.created_at, ""),
     scheduledFor: normalizeString(record.scheduled_for, ""),
     platformPostId: record.platform_post_id ?? null,
@@ -269,11 +277,14 @@ export function getDraftInputFromContentPost(post = {}) {
 }
 
 export function getGeneratedContentFromContentPost(post = {}) {
-  return normalizeGeneratedContent({
+  const content = normalizeGeneratedContent({
     hook: post.hook,
     caption: post.body,
     cta: post.cta,
     hashtags: post.hashtags,
     visual: post.visualDirection,
   });
+  content.mediaUrl = post.mediaUrl ?? null;
+  content.mediaType = post.mediaType ?? null;
+  return content;
 }

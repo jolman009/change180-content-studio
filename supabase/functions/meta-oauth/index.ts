@@ -154,6 +154,7 @@ Deno.serve(async (request) => {
     const now = new Date().toISOString();
 
     // Upsert Facebook credential with Page Access Token
+    // Store long-lived user token as refresh_token so page tokens can be re-derived if needed
     const { error: fbUpsertError } = await supabaseAdmin
       .from("platform_credentials")
       .upsert(
@@ -161,7 +162,7 @@ Deno.serve(async (request) => {
           user_id: user.id,
           platform: "Facebook",
           access_token: pageAccessToken,
-          refresh_token: null,
+          refresh_token: userAccessToken,
           token_expires_at: null, // Page tokens don't expire when derived from long-lived user token
           platform_user_id: page.id,
           platform_username: page.name || page.id,
@@ -212,7 +213,7 @@ Deno.serve(async (request) => {
             user_id: user.id,
             platform: "Instagram",
             access_token: pageAccessToken,
-            refresh_token: null,
+            refresh_token: userAccessToken,
             token_expires_at: null,
             platform_user_id: igId,
             platform_username: igUsername,

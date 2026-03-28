@@ -9,7 +9,7 @@ import { supabase } from "../lib/supabaseClient";
 
 const CONTENT_POSTS_STORAGE_KEY = "change180.contentPosts";
 const CONTENT_POST_SELECT =
-  "id, platform, content_type, pillar, goal, tone, topic, context, status, hook, body, cta, hashtags, visual_direction, created_at, scheduled_for, platform_post_id, published_at, publish_error";
+  "id, platform, content_type, pillar, goal, tone, topic, context, status, hook, body, cta, hashtags, visual_direction, media_url, media_type, created_at, scheduled_for, platform_post_id, published_at, publish_error";
 
 function getStoredContentPosts() {
   if (typeof window === "undefined") {

@@ -58,6 +58,7 @@ export default function PostPreview({ output, platform, contentType }) {
 
   const style = platformStyles[platform] || platformStyles.Instagram;
   const showImageArea = style.imageArea && contentType !== "Reel Script";
+  const hasMedia = output.mediaUrl;
 
   return (
     <div className="mb-4">
@@ -72,11 +73,19 @@ export default function PostPreview({ output, platform, contentType }) {
         </div>
 
         {showImageArea && (
-          <div className={style.imageArea}>
-            <p className="text-center text-lg font-semibold leading-snug text-[var(--secondary)]">
-              {output.hook}
-            </p>
-          </div>
+          hasMedia ? (
+            <img
+              src={output.mediaUrl}
+              alt="Post media"
+              className={`w-full object-cover ${platform === "Instagram" ? "aspect-square" : "aspect-video"}`}
+            />
+          ) : (
+            <div className={style.imageArea}>
+              <p className="text-center text-lg font-semibold leading-snug text-[var(--secondary)]">
+                {output.hook}
+              </p>
+            </div>
+          )
         )}
 
         <div className={style.body}>

@@ -92,6 +92,7 @@ Deno.serve(async (request) => {
     }
 
     const accessToken = tokenData.access_token as string;
+    const refreshToken = (tokenData.refresh_token as string) || null;
     const expiresIn = (tokenData.expires_in as number) || 5184000; // default 60 days
 
     // Fetch LinkedIn user info
@@ -114,7 +115,7 @@ Deno.serve(async (request) => {
       Date.now() + expiresIn * 1000,
     ).toISOString();
 
-    // Upsert credential
+    // Upsert credential (now stores refresh_token for silent refresh)
     const { error: upsertError } = await supabaseAdmin
       .from("platform_credentials")
       .upsert(
@@ -122,7 +123,7 @@ Deno.serve(async (request) => {
           user_id: user.id,
           platform: "LinkedIn",
           access_token: accessToken,
-          refresh_token: null,
+          refresh_token: refreshToken,
           token_expires_at: tokenExpiresAt,
           platform_user_id: platformUserId,
           platform_username: platformUsername,

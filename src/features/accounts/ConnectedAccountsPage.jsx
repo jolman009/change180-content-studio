@@ -20,6 +20,7 @@ export default function ConnectedAccountsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [disconnectingPlatform, setDisconnectingPlatform] = useState(null);
+  const [refreshingPlatform, setRefreshingPlatform] = useState(null);
 
   async function loadCredentials() {
     setIsLoading(true);
@@ -103,6 +104,12 @@ export default function ConnectedAccountsPage() {
     }
   }
 
+  function handleRefresh(platform) {
+    // Re-initiates OAuth flow to get fresh tokens
+    setRefreshingPlatform(platform);
+    handleConnect(platform);
+  }
+
   async function handleDisconnect(platform) {
     setDisconnectingPlatform(platform);
 
@@ -141,7 +148,9 @@ export default function ConnectedAccountsPage() {
         connectedPlatforms={credentials}
         onConnect={handleConnect}
         onDisconnect={handleDisconnect}
+        onRefresh={handleRefresh}
         disconnectingPlatform={disconnectingPlatform}
+        refreshingPlatform={refreshingPlatform}
       />
     </Card>
   );
