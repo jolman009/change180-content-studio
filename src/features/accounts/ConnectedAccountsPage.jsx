@@ -13,6 +13,7 @@ import {
 import { hasSupabaseEnv } from "../../lib/runtime";
 import { buildLinkedInAuthUrl } from "../../lib/linkedinOAuth";
 import { buildMetaAuthUrl } from "../../lib/metaOAuth";
+import { buildXAuthUrl } from "../../lib/xOAuth";
 
 export default function ConnectedAccountsPage() {
   const location = useLocation();
@@ -77,6 +78,15 @@ export default function ConnectedAccountsPage() {
         window.location.href = buildMetaAuthUrl(platform);
       } catch (error) {
         toast.error(error.message || "Unable to start Meta OAuth.");
+      }
+      return;
+    }
+
+    if (hasSupabaseEnv && platform === "X") {
+      try {
+        window.location.href = await buildXAuthUrl();
+      } catch (error) {
+        toast.error(error.message || "Unable to start X OAuth.");
       }
       return;
     }

@@ -80,7 +80,7 @@ Address missing functionality that users expect from a content studio.
 - [x] Scheduled posts shown with sky-blue styling, clock icon, and countdown ("Tomorrow", "In X days", "Due now")
 - [x] `"scheduled"` already existed in `POST_STATUSES` — status filter works out of the box
 - [x] Handles missing credentials per-post (sets error, continues batch)
-- [ ] Set up Supabase cron job to invoke the function periodically *(requires Supabase dashboard config)*
+- [x] Set up Supabase cron job to invoke the function periodically *(configured in Supabase dashboard)*
 
 ### 2.3 Media/Image Upload Support ✅ COMPLETED
 - [x] Created `mediaService.js` with `uploadMedia()` and `validateMediaFile()` — Supabase Storage with localStorage fallback
@@ -91,7 +91,7 @@ Address missing functionality that users expect from a content studio.
 - [x] `linkedin-publish` attaches image via `content.article.source` field
 - [x] `facebook-publish` uses `/photos` endpoint with `url` param when image attached
 - [x] `CalendarBoard` shows 16x16 image thumbnail on post cards
-- [ ] Create Supabase Storage bucket `post-media` *(requires Supabase dashboard config)*
+- [x] Create Supabase Storage bucket `post-media` *(configured in Supabase dashboard)*
 
 ---
 
@@ -99,38 +99,37 @@ Address missing functionality that users expect from a content studio.
 
 Polish and expand capabilities for a more complete product.
 
-### 3.1 Instagram Direct Publishing
-- [ ] Create `instagram-publish/index.ts` edge function using Instagram Content Publishing API
-  - Step 1: Create media container (`POST /{ig-user-id}/media`)
-  - Step 2: Publish container (`POST /{ig-user-id}/media_publish`)
-- [ ] Update `publishService.js` to route Instagram posts to the new endpoint
-- [ ] Handle Instagram-specific requirements (image required for feed posts, aspect ratio rules)
-- [ ] Add Instagram-specific validation in content form (caption length: 2200 chars)
+### 3.1 Instagram Direct Publishing ✅ COMPLETED
+- [x] Created `instagram-publish/index.ts` — two-step Graph API flow (create container → publish)
+- [x] Updated `publishService.js` with platform endpoint routing map (LinkedIn, Facebook, Instagram, X)
+- [x] Enforces image requirement for Instagram feed posts (returns 400 if no media_url)
+- [x] Instagram caption enforced at 2200 chars via shared `enforceCharLimit`
+- [x] Updated `scheduled-publish` with dedicated `publishToInstagram` function
 
-### 3.2 Platform Analytics Integration
-- [ ] Create `fetch-analytics/index.ts` edge function that:
-  - Pulls LinkedIn post analytics (impressions, clicks, engagement) via LinkedIn Analytics API
-  - Pulls Facebook post insights (reach, engagement, clicks) via Graph API
-  - Pulls Instagram post insights (impressions, reach, engagement) via Instagram Insights API
-- [ ] Add `post_analytics` table: post_id, platform, impressions, reach, engagement, clicks, fetched_at
-- [ ] Create `analyticsService.fetchPostAnalytics(postId)` to call the edge function
-- [ ] Update `AnalyticsNotesPage` with a metrics dashboard alongside manual notes
-- [ ] Show engagement metrics on published post cards in CalendarBoard
-- [ ] Add a "Refresh Metrics" button per post
+### 3.2 Platform Analytics Integration ✅ COMPLETED
+- [x] Created `fetch-analytics/index.ts` — fetches metrics from LinkedIn, Facebook, and Instagram APIs
+- [x] Metrics: impressions, reach, likes, comments, shares, clicks, engagement
+- [x] Upserts results into `post_analytics` table
+- [x] Added `fetchPostMetrics()` to `analyticsService.js` with mock fallback
+- [x] AnalyticsNotesPage now shows "Post Metrics" dashboard for published posts with per-post refresh
+- [x] Metric cards with icons: Eye, Users, Heart, MessageCircle, Share2, MousePointerClick
+- [ ] Create `post_analytics` table in Supabase *(requires dashboard config)*
 
-### 3.3 Content Templates
-- [ ] Design `content_templates` table: id, name, platform, content_type, pillar, tone, prompt_template, created_at
-- [ ] Create `templateService.js` with CRUD operations
-- [ ] Add "Save as Template" button in `GeneratedOutput.jsx`
-- [ ] Add template picker in `ContentForm.jsx` that pre-fills fields
-- [ ] Create a template management section (list, edit, delete) in a new page or modal
+### 3.3 Content Templates ✅ COMPLETED
+- [x] Created `templateService.js` with `getTemplates`, `saveTemplate`, `deleteTemplate` (Supabase + localStorage)
+- [x] Added "Save as Template" button in `GeneratedOutput.jsx` (BookmarkPlus icon)
+- [x] Added template picker dropdown in `ContentForm.jsx` that pre-fills form fields
+- [x] Templates stored with: name, platform, contentType, pillar, tone, promptTemplate, hookTemplate, ctaTemplate
+- [ ] Create `content_templates` table in Supabase *(requires dashboard config)*
+- [ ] Template management page with edit/delete *(deferred — CRUD works, UI management can be added later)*
 
-### 3.4 X (Twitter) Integration
-- [ ] Implement X OAuth 2.0 flow (`x-oauth/index.ts` edge function)
-- [ ] Create `x-publish/index.ts` edge function using X API v2
-- [ ] Add X to `publishService.js` routing
-- [ ] Update `ConnectedAccountsPage` to enable X connection
-- [ ] Add X-specific validation (280 char limit)
+### 3.4 X (Twitter) Integration ✅ COMPLETED
+- [x] Created `x-oauth/index.ts` — OAuth 2.0 PKCE flow with token exchange and user info
+- [x] Created `x-publish/index.ts` — posts tweets via X API v2 with 280 char enforcement
+- [x] Created `xOAuth.js` — frontend OAuth URL builder with PKCE code challenge generation
+- [x] Updated `ConnectedAccountsPage` to handle X connect via `buildXAuthUrl`
+- [x] Updated `OAuthCallbackPage` to detect and handle X OAuth callbacks with code verifier
+- [x] X added to `publishService.js` endpoint routing
 
 ---
 

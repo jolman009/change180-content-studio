@@ -21,6 +21,8 @@ export default function ContentForm({
   onMediaRemove,
   mediaPreviewUrl,
   isUploadingMedia,
+  templates = [],
+  onTemplateSelect,
   loading,
   error,
 }) {
@@ -40,6 +42,24 @@ export default function ContentForm({
 
   return (
     <div className="space-y-4">
+      {templates.length > 0 && onTemplateSelect ? (
+        <Select
+          label="Start from Template"
+          value=""
+          onChange={(e) => {
+            const tpl = templates.find((t) => t.id === e.target.value);
+            if (tpl) onTemplateSelect(tpl);
+          }}
+        >
+          <option value="">— Select a template —</option>
+          {templates.map((tpl) => (
+            <option key={tpl.id} value={tpl.id}>
+              {tpl.name} ({tpl.platform})
+            </option>
+          ))}
+        </Select>
+      ) : null}
+
       <Input label="Topic" name="topic" value={form.topic} onChange={onChange} />
       {fieldErrors.topic ? <p className="text-sm text-red-600">{fieldErrors.topic}</p> : null}
 

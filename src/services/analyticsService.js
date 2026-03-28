@@ -1,5 +1,6 @@
-import { hasSupabaseEnv } from "../lib/runtime";
+import { hasSupabaseEnv, hasApiBaseUrl } from "../lib/runtime";
 import { supabase } from "../lib/supabaseClient";
+import { apiPost } from "../lib/api";
 import { demoPerformanceLogs } from "../lib/demoData";
 
 const PERFORMANCE_LOGS_STORAGE_KEY = "change180.performanceLogs";
@@ -142,4 +143,25 @@ export async function savePerformanceLog(log) {
       fallbackReason: error?.message || "Supabase analytics is unavailable.",
     };
   }
+}
+
+export async function fetchPostMetrics(postId) {
+  if (!hasSupabaseEnv || !hasApiBaseUrl) {
+    // Return mock metrics in local mode
+    return {
+      data: {
+        impressions: Math.floor(Math.random() * 2000) + 100,
+        reach: Math.floor(Math.random() * 1500) + 80,
+        engagement: Math.floor(Math.random() * 200) + 10,
+        clicks: Math.floor(Math.random() * 100) + 5,
+        likes: Math.floor(Math.random() * 150) + 10,
+        comments: Math.floor(Math.random() * 30) + 1,
+        shares: Math.floor(Math.random() * 20),
+      },
+      source: "local",
+    };
+  }
+
+  const result = await apiPost("/fetch-analytics", { postId });
+  return { data: result.metrics, source: "supabase" };
 }

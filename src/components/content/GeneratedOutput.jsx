@@ -1,3 +1,4 @@
+import { BookmarkPlus } from "lucide-react";
 import Card from "../ui/Card";
 import EmptyState from "../ui/EmptyState";
 import ErrorState from "../ui/ErrorState";
@@ -25,6 +26,7 @@ export default function GeneratedOutput({
   onRetryGenerate,
   onRewrite,
   onSaveDraft,
+  onSaveAsTemplate,
   saveLabel = "Save Draft",
   publishStatus,
   onPublish,
@@ -117,7 +119,18 @@ export default function GeneratedOutput({
           <Textarea name="visual" value={output.visual} onChange={onChange} />
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex flex-wrap justify-end gap-2">
+          {onSaveAsTemplate ? (
+            <Button
+              variant="ghost"
+              className="w-full text-sm sm:w-auto"
+              onClick={onSaveAsTemplate}
+              disabled={isSaving}
+            >
+              <BookmarkPlus size={14} className="mr-1.5 inline-block" />
+              Save as Template
+            </Button>
+          ) : null}
           <Button className="w-full sm:w-auto" onClick={onSaveDraft} disabled={isSaving}>
             {isSaving ? "Saving Draft..." : saveLabel}
           </Button>

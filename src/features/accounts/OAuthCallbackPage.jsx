@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { validateOAuthState, getOAuthRedirectUri } from "../../lib/linkedinOAuth";
 import { validateMetaOAuthState, getOAuthPlatform, getOAuthRedirectUri as getMetaRedirectUri } from "../../lib/metaOAuth";
+import { validateXOAuthState, getCodeVerifier, getOAuthRedirectUri as getXRedirectUri } from "../../lib/xOAuth";
 import { apiPost } from "../../lib/api";
 
 export default function OAuthCallbackPage() {
@@ -53,6 +54,36 @@ export default function OAuthCallbackPage() {
           });
         } catch (err) {
           setError(err.message || "Failed to exchange authorization code.");
+        }
+        return;
+      }
+
+      // Check for X OAuth
+      const xCodeVerifier = getCodeVerifier();
+      if (xCodeVerifier) {
+        if (!validateXOAuthState(state)) {
+          setError("Invalid OAuth state. Please try connecting again.");
+          return;
+        }
+
+        try {
+          const result = await apiPost("/x-oauth", {
+            code,
+            redirectUri: getXRedirectUri(),
+            codeVerifier: xCodeVerifier,
+          });
+
+          navigate("/accounts", {
+            state: {
+              status: {
+                type: "success",
+                message: `X connected as @${result.platformUsername}.`,
+              },
+            },
+            replace: true,
+          });
+        } catch (err) {
+          setError(err.message || "Failed to exchange X authorization code.");
         }
         return;
       }

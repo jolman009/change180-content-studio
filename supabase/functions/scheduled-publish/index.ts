@@ -95,6 +95,56 @@ async function publishToFacebook(
   return { platformPostId: result.id };
 }
 
+async function publishToInstagram(
+  post: { hook: string; body: string; cta: string; hashtags: string[]; media_url: string | null },
+  credential: { access_token: string; platform_user_id: string },
+): Promise<{ platformPostId: string | null }> {
+  if (!post.media_url) {
+    throw new Error("Instagram feed posts require an image.");
+  }
+
+  const caption = composeMessage(post, "Instagram");
+
+  // Step 1: Create media container
+  const containerResponse = await fetch(
+    `${GRAPH_BASE}/${credential.platform_user_id}/media`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        image_url: post.media_url,
+        caption,
+        access_token: credential.access_token,
+      }),
+    },
+  );
+
+  const containerResult = await containerResponse.json();
+  if (!containerResponse.ok || !containerResult.id) {
+    throw new Error(containerResult.error?.message || "Failed to create Instagram media container.");
+  }
+
+  // Step 2: Publish the container
+  const publishResponse = await fetch(
+    `${GRAPH_BASE}/${credential.platform_user_id}/media_publish`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        creation_id: containerResult.id,
+        access_token: credential.access_token,
+      }),
+    },
+  );
+
+  const publishResult = await publishResponse.json();
+  if (!publishResponse.ok || !publishResult.id) {
+    throw new Error(publishResult.error?.message || "Failed to publish Instagram media.");
+  }
+
+  return { platformPostId: publishResult.id };
+}
+
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -119,7 +169,7 @@ Deno.serve(async (request) => {
     const now = new Date().toISOString();
     const { data: duePosts, error: queryError } = await supabaseAdmin
       .from("content_posts")
-      .select("id, user_id, platform, hook, body, cta, hashtags")
+      .select("id, user_id, platform, hook, body, cta, hashtags, media_url")
       .eq("status", "scheduled")
       .lte("scheduled_for", now)
       .is("published_at", null);
@@ -162,8 +212,10 @@ Deno.serve(async (request) => {
 
         if (post.platform === "LinkedIn") {
           publishResult = await publishToLinkedIn(post, credential);
-        } else if (post.platform === "Facebook" || post.platform === "Instagram") {
+        } else if (post.platform === "Facebook") {
           publishResult = await publishToFacebook(post, credential);
+        } else if (post.platform === "Instagram") {
+          publishResult = await publishToInstagram(post, credential);
         } else {
           throw new Error(`Publishing to ${post.platform} is not yet supported.`);
         }

@@ -20,9 +20,11 @@ import { generateContent, rewriteGeneratedContent } from "../../services/aiServi
 import { getContentPostById, saveContentPost, updateContentPost } from "../../services/contentService";
 import { publishPost } from "../../services/publishService";
 import { uploadMedia } from "../../services/mediaService";
+import { getTemplates, saveTemplate } from "../../services/templateService";
 
 export default function CreateContentPage() {
   const { draftId } = useParams();
+  const [templates, setTemplates] = useState([]);
   const [form, setForm] = useState(createContentDraftInput);
   const [loading, setLoading] = useState(false);
   const [isRewriting, setIsRewriting] = useState(false);
@@ -61,6 +63,17 @@ export default function CreateContentPage() {
     }
 
     loadBrandContext();
+
+    async function loadTemplates() {
+      try {
+        const result = await getTemplates();
+        if (isMounted) setTemplates(result.data);
+      } catch {
+        // Templates are optional — silently ignore
+      }
+    }
+
+    loadTemplates();
 
     return () => {
       isMounted = false;
@@ -202,6 +215,45 @@ export default function CreateContentPage() {
     setMediaUrl(null);
     setMediaType(null);
     setMediaPreviewUrl(null);
+  }
+
+  function handleTemplateSelect(template) {
+    setForm((prev) => ({
+      ...prev,
+      platform: template.platform || prev.platform,
+      contentType: template.contentType || prev.contentType,
+      pillar: template.pillar || prev.pillar,
+      tone: template.tone || prev.tone,
+      topic: template.promptTemplate || prev.topic,
+    }));
+    toast.info(`Template "${template.name}" applied.`);
+  }
+
+  async function handleSaveAsTemplate() {
+    if (!output) {
+      toast.error("Generate content before saving as a template.");
+      return;
+    }
+
+    const name = window.prompt("Template name:");
+    if (!name?.trim()) return;
+
+    try {
+      const result = await saveTemplate({
+        name: name.trim(),
+        platform: form.platform,
+        contentType: form.contentType,
+        pillar: form.pillar,
+        tone: form.tone,
+        promptTemplate: form.topic,
+        hookTemplate: output.hook,
+        ctaTemplate: output.cta,
+      });
+      setTemplates((prev) => [result.data, ...prev]);
+      toast.success(`Template "${name.trim()}" saved.`);
+    } catch (err) {
+      toast.error(err.message || "Failed to save template.");
+    }
   }
 
   async function onGenerate() {
@@ -375,6 +427,8 @@ export default function CreateContentPage() {
           onMediaRemove={handleMediaRemove}
           mediaPreviewUrl={mediaPreviewUrl}
           isUploadingMedia={isUploadingMedia}
+          templates={templates}
+          onTemplateSelect={handleTemplateSelect}
           loading={loading}
           error={generateError}
         />
@@ -394,6 +448,7 @@ export default function CreateContentPage() {
         onRetryGenerate={onGenerate}
         onRewrite={onRewrite}
         onSaveDraft={onSaveDraft}
+        onSaveAsTemplate={handleSaveAsTemplate}
         saveLabel={currentDraftId ? "Save Draft Changes" : "Save Draft"}
         publishStatus={currentDraftId ? publishStatus : null}
         onPublish={handlePublish}

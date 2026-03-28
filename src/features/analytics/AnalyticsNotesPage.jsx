@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { RefreshCw, Eye, Users, Heart, MessageCircle, Share2, MousePointerClick } from "lucide-react";
 import Card from "../../components/ui/Card";
 import Input from "../../components/ui/Input";
 import Textarea from "../../components/ui/Textarea";
 import Button from "../../components/ui/Button";
 import EmptyState from "../../components/ui/EmptyState";
 import LoadingState from "../../components/ui/LoadingState";
-import { getPerformanceLogs, savePerformanceLog } from "../../services/analyticsService";
+import { getPerformanceLogs, savePerformanceLog, fetchPostMetrics } from "../../services/analyticsService";
+import { getContentPosts } from "../../services/contentService";
 
 const initialForm = {
   postTitle: "",
@@ -16,29 +18,96 @@ const initialForm = {
   nextMove: "",
 };
 
+function MetricCard({ icon: Icon, label, value }) {
+  return (
+    <div className="flex items-center gap-3 rounded-xl border border-[var(--border)] bg-white p-3">
+      <Icon size={16} className="shrink-0 text-[var(--accent)]" />
+      <div>
+        <p className="text-xs text-gray-500">{label}</p>
+        <p className="text-sm font-semibold">{value ?? "—"}</p>
+      </div>
+    </div>
+  );
+}
+
+function PostMetricsCard({ post, onRefresh, isRefreshing }) {
+  return (
+    <article className="rounded-xl border border-[var(--border)] bg-[var(--bg)] p-4">
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <h4 className="truncate font-semibold">{post.hook || post.topic}</h4>
+          <p className="text-xs text-gray-500">
+            {post.platform} · Published{" "}
+            {post.publishedAt
+              ? new Date(post.publishedAt).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                })
+              : ""}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => onRefresh(post.id)}
+          disabled={isRefreshing}
+          className="shrink-0 rounded-lg p-1.5 text-[var(--muted)] transition hover:bg-white hover:text-[var(--primary)]"
+          aria-label="Refresh metrics"
+        >
+          <RefreshCw size={14} className={isRefreshing ? "animate-spin" : ""} />
+        </button>
+      </div>
+
+      {post.metrics ? (
+        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+          <MetricCard icon={Eye} label="Impressions" value={post.metrics.impressions?.toLocaleString()} />
+          <MetricCard icon={Users} label="Reach" value={post.metrics.reach?.toLocaleString()} />
+          <MetricCard icon={Heart} label="Likes" value={post.metrics.likes?.toLocaleString()} />
+          <MetricCard icon={MessageCircle} label="Comments" value={post.metrics.comments?.toLocaleString()} />
+          <MetricCard icon={Share2} label="Shares" value={post.metrics.shares?.toLocaleString()} />
+          <MetricCard icon={MousePointerClick} label="Clicks" value={post.metrics.clicks?.toLocaleString()} />
+        </div>
+      ) : (
+        <p className="mt-3 text-xs text-gray-400">No metrics yet. Click refresh to fetch.</p>
+      )}
+    </article>
+  );
+}
+
 export default function AnalyticsNotesPage() {
   const [form, setForm] = useState(initialForm);
   const [logs, setLogs] = useState([]);
+  const [publishedPosts, setPublishedPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [refreshingPostId, setRefreshingPostId] = useState(null);
 
   useEffect(() => {
     let active = true;
 
-    async function loadLogs() {
+    async function loadData() {
       try {
-        const result = await getPerformanceLogs();
+        const [logsResult, postsResult] = await Promise.all([
+          getPerformanceLogs(),
+          getContentPosts(),
+        ]);
+
         if (active) {
-          setLogs(result.data);
-          if (result.source !== "supabase") {
+          setLogs(logsResult.data);
+          setPublishedPosts(
+            postsResult.data
+              .filter((p) => p.status === "posted" && p.publishedAt)
+              .slice(0, 10)
+              .map((p) => ({ ...p, metrics: null }))
+          );
+          if (logsResult.source !== "supabase") {
             toast.info(
-              `Analytics notes are running in local demo mode. ${result.fallbackReason ?? ""}`.trim()
+              `Analytics notes are running in local demo mode. ${logsResult.fallbackReason ?? ""}`.trim()
             );
           }
         }
       } catch (error) {
         if (active) {
-          toast.error(error.message || "Unable to load analytics notes.");
+          toast.error(error.message || "Unable to load analytics data.");
         }
       } finally {
         if (active) {
@@ -47,12 +116,26 @@ export default function AnalyticsNotesPage() {
       }
     }
 
-    loadLogs();
+    loadData();
 
     return () => {
       active = false;
     };
   }, []);
+
+  async function handleRefreshMetrics(postId) {
+    setRefreshingPostId(postId);
+    try {
+      const result = await fetchPostMetrics(postId);
+      setPublishedPosts((prev) =>
+        prev.map((p) => (p.id === postId ? { ...p, metrics: result.data } : p))
+      );
+    } catch (err) {
+      toast.error(err.message || "Failed to fetch metrics.");
+    } finally {
+      setRefreshingPostId(null);
+    }
+  }
 
   function onChange(event) {
     const { name, value } = event.target;
@@ -88,14 +171,31 @@ export default function AnalyticsNotesPage() {
   if (loading) {
     return (
       <LoadingState
-        title="Loading Analytics Notes"
-        description="Pulling recent performance observations into the log."
+        title="Loading Analytics"
+        description="Pulling performance data and observations."
       />
     );
   }
 
   return (
     <div className="space-y-6">
+      {/* Platform Metrics Dashboard */}
+      {publishedPosts.length > 0 ? (
+        <Card title="Post Metrics" subtitle="Engagement data from published posts">
+          <div className="space-y-4">
+            {publishedPosts.map((post) => (
+              <PostMetricsCard
+                key={post.id}
+                post={post}
+                onRefresh={handleRefreshMetrics}
+                isRefreshing={refreshingPostId === post.id}
+              />
+            ))}
+          </div>
+        </Card>
+      ) : null}
+
+      {/* Manual Notes Form */}
       <Card
         title="Analytics Notes"
         subtitle="Capture what happened after posting so future content choices get sharper."
@@ -151,6 +251,7 @@ export default function AnalyticsNotesPage() {
         </div>
       </Card>
 
+      {/* Recent Notes */}
       {logs.length === 0 ? (
         <EmptyState
           title="Recent Notes"
