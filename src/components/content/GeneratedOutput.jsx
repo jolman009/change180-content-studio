@@ -16,8 +16,6 @@ export default function GeneratedOutput({
   loading,
   error,
   fieldErrors = {},
-  aiStatus,
-  saveStatus,
   isSaving,
   isRewriting,
   activeRewriteAction,
@@ -69,32 +67,6 @@ export default function GeneratedOutput({
 
   return (
     <Card title="Generated Output" subtitle="Review, refine, and save">
-      {aiStatus?.message ? (
-        <div
-          className={`mb-4 rounded-xl border px-4 py-3 text-sm ${
-            aiStatus.type === "error"
-              ? "border-red-200 bg-red-50 text-red-700"
-              : aiStatus.type === "success"
-                ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                : "border-sky-200 bg-sky-50 text-sky-700"
-          }`}
-        >
-          {aiStatus.message}
-        </div>
-      ) : null}
-
-      {saveStatus?.message ? (
-        <div
-          className={`mb-4 rounded-xl border px-4 py-3 text-sm ${
-            saveStatus.type === "error"
-              ? "border-red-200 bg-red-50 text-red-700"
-              : "border-emerald-200 bg-emerald-50 text-emerald-700"
-          }`}
-        >
-          {saveStatus.message}
-        </div>
-      ) : null}
-
       <PostPreview output={output} platform={platform} contentType={contentType} />
       <QuoteCard output={output} platform={platform} />
 

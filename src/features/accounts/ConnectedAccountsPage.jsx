@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { toast } from "sonner";
 import Card from "../../components/ui/Card";
 import ErrorState from "../../components/ui/ErrorState";
 import LoadingState from "../../components/ui/LoadingState";
@@ -16,30 +17,24 @@ import { buildMetaAuthUrl } from "../../lib/metaOAuth";
 export default function ConnectedAccountsPage() {
   const location = useLocation();
   const [credentials, setCredentials] = useState([]);
-  const [status, setStatus] = useState({ type: "", message: "" });
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [disconnectingPlatform, setDisconnectingPlatform] = useState(null);
 
   async function loadCredentials() {
     setIsLoading(true);
-    setStatus({ type: "", message: "" });
+    setLoadError("");
 
     try {
       const result = await getConnectedPlatforms();
       setCredentials(result.data);
-      setStatus({
-        type: "info",
-        message:
-          result.source === "supabase"
-            ? "Loaded connected accounts from Supabase."
-            : "Loaded connected accounts from local storage.",
-      });
+      if (result.source !== "supabase") {
+        toast.info("Loaded connected accounts from local storage.");
+      }
     } catch (error) {
       setCredentials([]);
-      setStatus({
-        type: "error",
-        message: error.message || "Unable to load connected accounts.",
-      });
+      setLoadError(error.message || "Unable to load connected accounts.");
+      toast.error(error.message || "Unable to load connected accounts.");
     } finally {
       setIsLoading(false);
     }
@@ -52,7 +47,14 @@ export default function ConnectedAccountsPage() {
   // Check for OAuth callback status passed via navigation state
   useEffect(() => {
     if (location.state?.status) {
-      setStatus(location.state.status);
+      const s = location.state.status;
+      if (s.type === "success") {
+        toast.success(s.message);
+      } else if (s.type === "error") {
+        toast.error(s.message);
+      } else {
+        toast.info(s.message);
+      }
       loadCredentials();
       // Clear navigation state so it doesn't persist on refresh
       window.history.replaceState({}, document.title);
@@ -60,16 +62,11 @@ export default function ConnectedAccountsPage() {
   }, [location.state]);
 
   async function handleConnect(platform) {
-    setStatus({ type: "", message: "" });
-
     if (hasSupabaseEnv && platform === "LinkedIn") {
       try {
         window.location.href = buildLinkedInAuthUrl();
       } catch (error) {
-        setStatus({
-          type: "error",
-          message: error.message || "Unable to start LinkedIn OAuth.",
-        });
+        toast.error(error.message || "Unable to start LinkedIn OAuth.");
       }
       return;
     }
@@ -78,19 +75,13 @@ export default function ConnectedAccountsPage() {
       try {
         window.location.href = buildMetaAuthUrl(platform);
       } catch (error) {
-        setStatus({
-          type: "error",
-          message: error.message || "Unable to start Meta OAuth.",
-        });
+        toast.error(error.message || "Unable to start Meta OAuth.");
       }
       return;
     }
 
     if (hasSupabaseEnv) {
-      setStatus({
-        type: "info",
-        message: `OAuth for ${platform} is not yet configured. Connect will be available in a future update.`,
-      });
+      toast.info(`OAuth for ${platform} is not yet configured. Connect will be available in a future update.`);
       return;
     }
 
@@ -106,34 +97,21 @@ export default function ConnectedAccountsPage() {
 
       await savePlatformCredential(mockCredential);
       await loadCredentials();
-      setStatus({
-        type: "success",
-        message: `${platform} connected successfully (mock).`,
-      });
+      toast.success(`${platform} connected successfully (mock).`);
     } catch (error) {
-      setStatus({
-        type: "error",
-        message: error.message || `Unable to connect ${platform}.`,
-      });
+      toast.error(error.message || `Unable to connect ${platform}.`);
     }
   }
 
   async function handleDisconnect(platform) {
     setDisconnectingPlatform(platform);
-    setStatus({ type: "", message: "" });
 
     try {
       await disconnectPlatform(platform);
       await loadCredentials();
-      setStatus({
-        type: "success",
-        message: `${platform} disconnected.`,
-      });
+      toast.success(`${platform} disconnected.`);
     } catch (error) {
-      setStatus({
-        type: "error",
-        message: error.message || `Unable to disconnect ${platform}.`,
-      });
+      toast.error(error.message || `Unable to disconnect ${platform}.`);
     } finally {
       setDisconnectingPlatform(null);
     }
@@ -148,31 +126,17 @@ export default function ConnectedAccountsPage() {
     );
   }
 
-  if (status.type === "error" && credentials.length === 0) {
+  if (loadError && credentials.length === 0) {
     return (
       <ErrorState
         title="Connected Accounts"
-        message={status.message}
+        message={loadError}
       />
     );
   }
 
   return (
     <Card title="Connected Accounts" subtitle="Manage your social platform connections">
-      {status.message ? (
-        <div
-          className={`mb-4 rounded-xl border px-4 py-3 text-sm ${
-            status.type === "error"
-              ? "border-red-200 bg-red-50 text-red-700"
-              : status.type === "success"
-                ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                : "border-sky-200 bg-sky-50 text-sky-700"
-          }`}
-        >
-          {status.message}
-        </div>
-      ) : null}
-
       <PlatformConnectionList
         connectedPlatforms={credentials}
         onConnect={handleConnect}

@@ -1,4 +1,5 @@
 import { corsHeaders } from "../_shared/cors.ts";
+import { validateGenerateContentBody } from "../_shared/validation.ts";
 
 const OPENAI_API_URL = "https://api.openai.com/v1/responses";
 const OPENAI_MODEL = Deno.env.get("OPENAI_MODEL") ?? "gpt-5-mini";
@@ -227,9 +228,12 @@ Deno.serve(async (request) => {
   try {
     const body = (await request.json()) as GenerateContentRequest;
 
-    if (!body?.mode || !body?.input?.topic) {
+    const validationErrors = validateGenerateContentBody(
+      body as unknown as Record<string, unknown>,
+    );
+    if (validationErrors.length > 0) {
       return jsonResponse(
-        { message: "Invalid request body for generate-content." },
+        { message: validationErrors.join(" ") },
         400,
       );
     }

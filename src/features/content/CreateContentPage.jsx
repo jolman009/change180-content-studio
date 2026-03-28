@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { toast } from "sonner";
 import Card from "../../components/ui/Card";
 import ContentForm from "../../components/content/ContentForm";
 import GeneratedOutput from "../../components/content/GeneratedOutput";
@@ -29,8 +30,6 @@ export default function CreateContentPage() {
   const [fieldErrors, setFieldErrors] = useState({});
   const [outputErrors, setOutputErrors] = useState({});
   const [generateError, setGenerateError] = useState("");
-  const [aiStatus, setAiStatus] = useState({ type: "", message: "" });
-  const [saveStatus, setSaveStatus] = useState({ type: "", message: "" });
   const [isSaving, setIsSaving] = useState(false);
   const [brandProfile, setBrandProfile] = useState(null);
   const [draftLoadError, setDraftLoadError] = useState("");
@@ -94,10 +93,7 @@ export default function CreateContentPage() {
           platformPostId: result.data.platformPostId,
           publishError: result.data.publishError,
         });
-        setAiStatus({
-          type: "info",
-          message: "Loaded saved draft into the editor.",
-        });
+        toast.info("Loaded saved draft into the editor.");
       } catch (error) {
         if (isMounted) {
           setDraftLoadError(error.message || "Unable to load the selected draft.");
@@ -146,8 +142,6 @@ export default function CreateContentPage() {
       return next;
     });
     setGenerateError("");
-    setAiStatus({ type: "", message: "" });
-    setSaveStatus({ type: "", message: "" });
   }
 
   function onOutputChange(e) {
@@ -176,8 +170,6 @@ export default function CreateContentPage() {
       delete next[name];
       return next;
     });
-    setSaveStatus({ type: "", message: "" });
-    setAiStatus({ type: "", message: "" });
   }
 
   async function onGenerate() {
@@ -194,16 +186,11 @@ export default function CreateContentPage() {
     setGenerateError("");
     setFieldErrors({});
     setOutputErrors({});
-    setAiStatus({ type: "", message: "" });
-    setSaveStatus({ type: "", message: "" });
 
     try {
       const generated = await generateContent(form, brandProfile);
       setOutput(normalizeGeneratedContent(generated));
-      setAiStatus({
-        type: "success",
-        message: "Draft generated with current brand context.",
-      });
+      toast.success("Draft generated with current brand context.");
     } catch (err) {
       setOutput(null);
       setGenerateError(err.message || "Unable to generate content.");
@@ -214,31 +201,20 @@ export default function CreateContentPage() {
 
   async function onRewrite(actionId) {
     if (!output) {
-      setAiStatus({
-        type: "error",
-        message: "Generate content before using rewrite actions.",
-      });
+      toast.error("Generate content before using rewrite actions.");
       return;
     }
 
     setIsRewriting(true);
     setActiveRewriteAction(actionId);
     setGenerateError("");
-    setAiStatus({ type: "", message: "" });
-    setSaveStatus({ type: "", message: "" });
 
     try {
       const rewritten = await rewriteGeneratedContent(form, output, actionId, brandProfile);
       setOutput(normalizeGeneratedContent(rewritten));
-      setAiStatus({
-        type: "success",
-        message: `Applied the ${actionId.replace("_", " ")} rewrite action.`,
-      });
+      toast.success(`Applied the ${actionId.replace("_", " ")} rewrite action.`);
     } catch (err) {
-      setAiStatus({
-        type: "error",
-        message: err.message || "Unable to rewrite the generated content.",
-      });
+      toast.error(err.message || "Unable to rewrite the generated content.");
     } finally {
       setIsRewriting(false);
       setActiveRewriteAction("");
@@ -257,11 +233,13 @@ export default function CreateContentPage() {
         publishedAt: result.data.publishedAt,
         publishError: null,
       });
+      toast.success(`Published to ${platform}.`);
     } catch (err) {
       setPublishStatus((prev) => ({
         ...prev,
         publishError: err.message || "Publish failed",
       }));
+      toast.error(err.message || "Publish failed.");
     } finally {
       setIsPublishing(false);
     }
@@ -269,10 +247,7 @@ export default function CreateContentPage() {
 
   async function onSaveDraft() {
     if (!output) {
-      setSaveStatus({
-        type: "error",
-        message: "Generate content before saving a draft.",
-      });
+      toast.error("Generate content before saving a draft.");
       return;
     }
 
@@ -282,15 +257,11 @@ export default function CreateContentPage() {
     if (Object.keys(nextFormErrors).length > 0 || Object.keys(nextOutputErrors).length > 0) {
       setFieldErrors(nextFormErrors);
       setOutputErrors(nextOutputErrors);
-      setSaveStatus({
-        type: "error",
-        message: "Fix the missing draft fields before saving.",
-      });
+      toast.error("Fix the missing draft fields before saving.");
       return;
     }
 
     setIsSaving(true);
-    setSaveStatus({ type: "", message: "" });
 
     try {
       const draft = createContentPost(form, output);
@@ -302,22 +273,17 @@ export default function CreateContentPage() {
         setCurrentDraftId(result.data.id);
       }
 
-      setSaveStatus({
-        type: "success",
-        message:
-          result.source === "supabase"
-            ? currentDraftId
-              ? "Draft updates saved to Supabase."
-              : "Draft saved to Supabase."
-            : currentDraftId
-              ? "Draft updates saved in local mock storage."
-              : "Draft saved in local mock storage.",
-      });
+      if (result.source === "supabase") {
+        toast.success(currentDraftId ? "Draft updates saved." : "Draft saved.");
+      } else {
+        toast.info(
+          currentDraftId
+            ? "Draft updates saved in local mock storage."
+            : "Draft saved in local mock storage."
+        );
+      }
     } catch (err) {
-      setSaveStatus({
-        type: "error",
-        message: err.message || "Unable to save the draft.",
-      });
+      toast.error(err.message || "Unable to save the draft.");
     } finally {
       setIsSaving(false);
     }
@@ -373,11 +339,9 @@ export default function CreateContentPage() {
         output={output}
         loading={loading}
         error={generateError}
-        aiStatus={aiStatus}
         isRewriting={isRewriting}
         activeRewriteAction={activeRewriteAction}
         fieldErrors={outputErrors}
-        saveStatus={saveStatus}
         isSaving={isSaving}
         platform={form.platform}
         contentType={form.contentType}

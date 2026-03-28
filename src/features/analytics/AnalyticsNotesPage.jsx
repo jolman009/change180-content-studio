@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import Card from "../../components/ui/Card";
 import Input from "../../components/ui/Input";
 import Textarea from "../../components/ui/Textarea";
@@ -20,7 +21,6 @@ export default function AnalyticsNotesPage() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [status, setStatus] = useState({ type: "", message: "" });
 
   useEffect(() => {
     let active = true;
@@ -30,17 +30,15 @@ export default function AnalyticsNotesPage() {
         const result = await getPerformanceLogs();
         if (active) {
           setLogs(result.data);
-          setStatus({
-            type: result.source === "supabase" ? "info" : "error",
-            message:
-              result.source === "supabase"
-                ? "Analytics notes loaded from Supabase."
-                : `Analytics notes are currently running in local demo mode. ${result.fallbackReason ?? ""}`.trim(),
-          });
+          if (result.source !== "supabase") {
+            toast.info(
+              `Analytics notes are running in local demo mode. ${result.fallbackReason ?? ""}`.trim()
+            );
+          }
         }
       } catch (error) {
         if (active) {
-          setStatus({ type: "error", message: error.message || "Unable to load analytics notes." });
+          toast.error(error.message || "Unable to load analytics notes.");
         }
       } finally {
         if (active) {
@@ -59,39 +57,29 @@ export default function AnalyticsNotesPage() {
   function onChange(event) {
     const { name, value } = event.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-    if (status.type === "error") {
-      setStatus({ type: "", message: "" });
-    }
   }
 
   async function onSave() {
     if (!form.postTitle.trim() || !form.outcome.trim() || !form.insight.trim()) {
-      setStatus({
-        type: "error",
-        message: "Post title, outcome, and insight are required before saving.",
-      });
+      toast.error("Post title, outcome, and insight are required before saving.");
       return;
     }
 
     setSaving(true);
-    setStatus({ type: "", message: "" });
 
     try {
       const result = await savePerformanceLog(form);
       setLogs((prev) => [result.data, ...prev]);
       setForm(initialForm);
-      setStatus({
-        type: result.source === "supabase" ? "success" : "error",
-        message:
-          result.source === "supabase"
-            ? "Analytics note saved to Supabase."
-            : `Analytics note saved in local demo mode. ${result.fallbackReason ?? ""}`.trim(),
-      });
+      if (result.source === "supabase") {
+        toast.success("Analytics note saved.");
+      } else {
+        toast.info(
+          `Analytics note saved in local demo mode. ${result.fallbackReason ?? ""}`.trim()
+        );
+      }
     } catch (error) {
-      setStatus({
-        type: "error",
-        message: error.message || "Unable to save analytics note.",
-      });
+      toast.error(error.message || "Unable to save analytics note.");
     } finally {
       setSaving(false);
     }
@@ -112,20 +100,6 @@ export default function AnalyticsNotesPage() {
         title="Analytics Notes"
         subtitle="Capture what happened after posting so future content choices get sharper."
       >
-        {status.message ? (
-          <div
-            className={`mb-4 rounded-xl border px-4 py-3 text-sm ${
-              status.type === "error"
-                ? "border-red-200 bg-red-50 text-red-700"
-                : status.type === "success"
-                  ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                  : "border-sky-200 bg-sky-50 text-sky-700"
-            }`}
-          >
-            {status.message}
-          </div>
-        ) : null}
-
         <div className="grid gap-4 md:grid-cols-2">
           <Input
             label="Post Title"

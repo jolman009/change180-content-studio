@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
 import CalendarBoard from "../../components/calendar/CalendarBoard";
 import ErrorState from "../../components/ui/ErrorState";
 import LoadingState from "../../components/ui/LoadingState";
@@ -18,7 +19,6 @@ export default function CalendarPage() {
   const { posts, loading, error, savingPostId, savePostUpdates, reloadPosts } = useContentPosts();
   const [publishingPostId, setPublishingPostId] = useState(null);
   const [duplicatingPostId, setDuplicatingPostId] = useState(null);
-  const [duplicateStatus, setDuplicateStatus] = useState({ type: "", message: "" });
 
   async function handlePublish(postId, platform) {
     setPublishingPostId(postId);
@@ -31,10 +31,12 @@ export default function CalendarPage() {
         publishError: null,
         status: "posted",
       });
+      toast.success(`Published to ${platform}.`);
     } catch (err) {
       savePostUpdates(postId, {
         publishError: err.message || "Publish failed",
       });
+      toast.error(err.message || "Publish failed.");
     } finally {
       setPublishingPostId(null);
     }
@@ -45,7 +47,6 @@ export default function CalendarPage() {
     if (!sourcePost) return;
 
     setDuplicatingPostId(postId);
-    setDuplicateStatus({ type: "", message: "" });
 
     try {
       await saveContentPost({
@@ -66,15 +67,9 @@ export default function CalendarPage() {
       });
 
       await reloadPosts();
-      setDuplicateStatus({
-        type: "success",
-        message: `Duplicated to ${targetPlatform} as a new draft.`,
-      });
+      toast.success(`Duplicated to ${targetPlatform} as a new draft.`);
     } catch (err) {
-      setDuplicateStatus({
-        type: "error",
-        message: err.message || `Unable to duplicate to ${targetPlatform}.`,
-      });
+      toast.error(err.message || `Unable to duplicate to ${targetPlatform}.`);
     } finally {
       setDuplicatingPostId(null);
     }
@@ -97,29 +92,15 @@ export default function CalendarPage() {
   const calendarGroups = buildCalendarGroups(filteredPosts);
 
   return (
-    <>
-      {duplicateStatus.message ? (
-        <div
-          className={`mb-4 rounded-xl border px-4 py-3 text-sm ${
-            duplicateStatus.type === "error"
-              ? "border-red-200 bg-red-50 text-red-700"
-              : "border-emerald-200 bg-emerald-50 text-emerald-700"
-          }`}
-        >
-          {duplicateStatus.message}
-        </div>
-      ) : null}
-
-      <CalendarBoard
-        groups={calendarGroups}
-        savingPostId={savingPostId}
-        onStatusChange={(postId, status) => savePostUpdates(postId, { status })}
-        onScheduleChange={(postId, scheduledFor) => savePostUpdates(postId, { scheduledFor })}
-        onPublish={handlePublish}
-        publishingPostId={publishingPostId}
-        onDuplicate={handleDuplicate}
-        duplicatingPostId={duplicatingPostId}
-      />
-    </>
+    <CalendarBoard
+      groups={calendarGroups}
+      savingPostId={savingPostId}
+      onStatusChange={(postId, status) => savePostUpdates(postId, { status })}
+      onScheduleChange={(postId, scheduledFor) => savePostUpdates(postId, { scheduledFor })}
+      onPublish={handlePublish}
+      publishingPostId={publishingPostId}
+      onDuplicate={handleDuplicate}
+      duplicatingPostId={duplicatingPostId}
+    />
   );
 }

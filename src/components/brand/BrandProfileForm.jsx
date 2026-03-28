@@ -15,29 +15,16 @@ function FieldError({ message }) {
 export default function BrandProfileForm({
   form,
   fieldErrors,
-  status,
   isSaving,
   onChange,
   onSave,
 }) {
-  const statusClassName =
-    status.type === "error"
-      ? "border-red-200 bg-red-50 text-red-700"
-      : status.type === "success"
-        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-        : "border-sky-200 bg-sky-50 text-sky-700";
-
   return (
     <Card
       title="Brand Brain"
       subtitle="This is where the voice of Change180 is stored."
       className="max-w-4xl"
     >
-      {status.message ? (
-        <div className={`mb-4 rounded-xl border px-4 py-3 text-sm ${statusClassName}`}>
-          {status.message}
-        </div>
-      ) : null}
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">

@@ -1,4 +1,5 @@
 import { corsHeaders } from "../_shared/cors.ts";
+import { validateOAuthBody } from "../_shared/validation.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const GRAPH_BASE = "https://graph.facebook.com/v22.0";
@@ -55,14 +56,13 @@ Deno.serve(async (request) => {
       return jsonResponse({ message: "Invalid or expired token." }, 401);
     }
 
-    const { code, redirectUri } = await request.json();
-
-    if (!code || !redirectUri) {
-      return jsonResponse(
-        { message: "Missing code or redirectUri." },
-        400,
-      );
+    const requestBody = await request.json();
+    const oauthErrors = validateOAuthBody(requestBody as Record<string, unknown>);
+    if (oauthErrors.length > 0) {
+      return jsonResponse({ message: oauthErrors.join(" ") }, 400);
     }
+
+    const { code, redirectUri } = requestBody;
 
     // Step 1: Exchange code for short-lived user access token
     const tokenParams = new URLSearchParams({

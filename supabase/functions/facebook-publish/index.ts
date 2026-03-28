@@ -1,4 +1,5 @@
 import { corsHeaders } from "../_shared/cors.ts";
+import { isUUID, stripHtml, sanitizeHashtags, enforceCharLimit } from "../_shared/validation.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const GRAPH_BASE = "https://graph.facebook.com/v22.0";
@@ -48,8 +49,8 @@ Deno.serve(async (request) => {
 
     const { postId } = await request.json();
 
-    if (!postId) {
-      return jsonResponse({ message: "Missing postId." }, 400);
+    if (!isUUID(postId)) {
+      return jsonResponse({ message: "Missing or invalid postId (UUID required)." }, 400);
     }
 
     // Get Facebook credential
@@ -90,15 +91,15 @@ Deno.serve(async (request) => {
       return jsonResponse({ message: "Content post not found." }, 404);
     }
 
-    // Compose message
-    const parts = [post.hook, post.body, post.cta].filter(Boolean);
-    const hashtags = Array.isArray(post.hashtags)
-      ? post.hashtags.join(" ")
-      : "";
+    // Compose message (sanitized)
+    const parts = [post.hook, post.body, post.cta]
+      .filter(Boolean)
+      .map((t: string) => stripHtml(t));
+    const hashtags = sanitizeHashtags(post.hashtags).join(" ");
     if (hashtags) {
       parts.push(hashtags);
     }
-    const message = parts.join("\n\n");
+    const message = enforceCharLimit(parts.join("\n\n"), "Facebook");
 
     // Publish to Facebook Page
     const fbResponse = await fetch(

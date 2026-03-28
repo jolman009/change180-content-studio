@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import BrandProfileForm from "../../components/brand/BrandProfileForm";
 import ErrorState from "../../components/ui/ErrorState";
 import LoadingState from "../../components/ui/LoadingState";
@@ -8,31 +9,24 @@ import { getBrandProfile, saveBrandProfile } from "../../services/brandService";
 export default function BrandProfilePage() {
   const [form, setForm] = useState(createBrandProfile);
   const [fieldErrors, setFieldErrors] = useState({});
-  const [status, setStatus] = useState({ type: "", message: "" });
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
   async function loadBrandProfile() {
     setIsLoading(true);
-    setStatus({ type: "", message: "" });
+    setLoadError("");
 
     try {
       const result = await getBrandProfile();
-
       setForm(result.data);
-      setStatus({
-        type: "info",
-        message:
-          result.source === "supabase"
-            ? "Loaded saved brand profile from Supabase."
-            : "Loaded brand profile from local mock storage.",
-      });
+      if (result.source !== "supabase") {
+        toast.info("Loaded brand profile from local mock storage.");
+      }
     } catch (error) {
       setForm(createBrandProfile());
-      setStatus({
-        type: "error",
-        message: error.message || "Unable to load the brand profile.",
-      });
+      setLoadError(error.message || "Unable to load the brand profile.");
+      toast.error(error.message || "Unable to load the brand profile.");
     } finally {
       setIsLoading(false);
     }
@@ -55,7 +49,6 @@ export default function BrandProfilePage() {
       delete next[name];
       return next;
     });
-    setStatus((prev) => (prev.type === "error" ? { type: "", message: "" } : prev));
   }
 
   async function onSave() {
@@ -63,33 +56,23 @@ export default function BrandProfilePage() {
 
     if (Object.keys(nextErrors).length > 0) {
       setFieldErrors(nextErrors);
-      setStatus({
-        type: "error",
-        message: "Fill the required brand voice fields before saving.",
-      });
+      toast.error("Fill the required brand voice fields before saving.");
       return;
     }
 
     setIsSaving(true);
     setFieldErrors({});
-    setStatus({ type: "", message: "" });
 
     try {
       const result = await saveBrandProfile(form);
-
       setForm(result.data);
-      setStatus({
-        type: "success",
-        message:
-          result.source === "supabase"
-            ? "Brand profile saved to Supabase."
-            : "Brand profile saved in local mock storage.",
-      });
+      if (result.source === "supabase") {
+        toast.success("Brand profile saved.");
+      } else {
+        toast.info("Brand profile saved in local mock storage.");
+      }
     } catch (error) {
-      setStatus({
-        type: "error",
-        message: error.message || "Unable to save the brand profile.",
-      });
+      toast.error(error.message || "Unable to save the brand profile.");
     } finally {
       setIsSaving(false);
     }
@@ -104,11 +87,11 @@ export default function BrandProfilePage() {
     );
   }
 
-  if (status.type === "error" && !form) {
+  if (loadError && !form) {
     return (
       <ErrorState
         title="Brand Profile"
-        message={status.message}
+        message={loadError}
       />
     );
   }
@@ -117,7 +100,6 @@ export default function BrandProfilePage() {
     <BrandProfileForm
       form={form}
       fieldErrors={fieldErrors}
-      status={status}
       isSaving={isSaving}
       onChange={onChange}
       onSave={onSave}

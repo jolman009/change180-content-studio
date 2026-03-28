@@ -1,32 +1,55 @@
+import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
-import NotFoundPage from "../features/app/NotFoundPage";
-import RouteErrorPage from "../features/app/RouteErrorPage";
-import LoginPage from "../features/auth/LoginPage";
+import LoadingState from "../components/ui/LoadingState";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
-import AnalyticsNotesPage from "../features/analytics/AnalyticsNotesPage";
-import BrandProfilePage from "../features/brand/BrandProfilePage";
-import CreateContentPage from "../features/content/CreateContentPage";
-import CalendarPage from "../features/calendar/CalendarPage";
-import ConnectedAccountsPage from "../features/accounts/ConnectedAccountsPage";
-import OAuthCallbackPage from "../features/accounts/OAuthCallbackPage";
-import DashboardPage from "../features/dashboard/DashboardPage";
-import NextMovesPage from "../features/strategy/NextMovesPage";
-import PrivacyPolicyPage from "../features/app/PrivacyPolicyPage";
-import DataDeletionPage from "../features/app/DataDeletionPage";
+import RouteErrorPage from "../features/app/RouteErrorPage";
+
+const LoginPage = lazy(() => import("../features/auth/LoginPage"));
+const NotFoundPage = lazy(() => import("../features/app/NotFoundPage"));
+const PrivacyPolicyPage = lazy(() => import("../features/app/PrivacyPolicyPage"));
+const DataDeletionPage = lazy(() => import("../features/app/DataDeletionPage"));
+const DashboardPage = lazy(() => import("../features/dashboard/DashboardPage"));
+const NextMovesPage = lazy(() => import("../features/strategy/NextMovesPage"));
+const BrandProfilePage = lazy(() => import("../features/brand/BrandProfilePage"));
+const ConnectedAccountsPage = lazy(() => import("../features/accounts/ConnectedAccountsPage"));
+const OAuthCallbackPage = lazy(() => import("../features/accounts/OAuthCallbackPage"));
+const CreateContentPage = lazy(() => import("../features/content/CreateContentPage"));
+const CalendarPage = lazy(() => import("../features/calendar/CalendarPage"));
+const AnalyticsNotesPage = lazy(() => import("../features/analytics/AnalyticsNotesPage"));
+
+function SuspenseWrapper({ children }) {
+  return (
+    <Suspense fallback={<LoadingState title="Loading" description="Preparing the page." />}>
+      {children}
+    </Suspense>
+  );
+}
 
 export const router = createBrowserRouter([
   {
     path: "/login",
-    element: <LoginPage />,
+    element: (
+      <SuspenseWrapper>
+        <LoginPage />
+      </SuspenseWrapper>
+    ),
   },
   {
     path: "/privacy-policy",
-    element: <PrivacyPolicyPage />,
+    element: (
+      <SuspenseWrapper>
+        <PrivacyPolicyPage />
+      </SuspenseWrapper>
+    ),
   },
   {
     path: "/data-deletion",
-    element: <DataDeletionPage />,
+    element: (
+      <SuspenseWrapper>
+        <DataDeletionPage />
+      </SuspenseWrapper>
+    ),
   },
   {
     path: "/",
@@ -37,16 +60,86 @@ export const router = createBrowserRouter([
     ),
     errorElement: <RouteErrorPage />,
     children: [
-      { index: true, element: <DashboardPage /> },
-      { path: "next-moves", element: <NextMovesPage /> },
-      { path: "brand", element: <BrandProfilePage /> },
-      { path: "accounts", element: <ConnectedAccountsPage /> },
-      { path: "accounts/callback", element: <OAuthCallbackPage /> },
-      { path: "create", element: <CreateContentPage /> },
-      { path: "create/:draftId", element: <CreateContentPage /> },
-      { path: "calendar", element: <CalendarPage /> },
-      { path: "analytics", element: <AnalyticsNotesPage /> },
-      { path: "*", element: <NotFoundPage /> },
+      {
+        index: true,
+        element: (
+          <SuspenseWrapper>
+            <DashboardPage />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: "next-moves",
+        element: (
+          <SuspenseWrapper>
+            <NextMovesPage />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: "brand",
+        element: (
+          <SuspenseWrapper>
+            <BrandProfilePage />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: "accounts",
+        element: (
+          <SuspenseWrapper>
+            <ConnectedAccountsPage />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: "accounts/callback",
+        element: (
+          <SuspenseWrapper>
+            <OAuthCallbackPage />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: "create",
+        element: (
+          <SuspenseWrapper>
+            <CreateContentPage />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: "create/:draftId",
+        element: (
+          <SuspenseWrapper>
+            <CreateContentPage />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: "calendar",
+        element: (
+          <SuspenseWrapper>
+            <CalendarPage />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: "analytics",
+        element: (
+          <SuspenseWrapper>
+            <AnalyticsNotesPage />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: "*",
+        element: (
+          <SuspenseWrapper>
+            <NotFoundPage />
+          </SuspenseWrapper>
+        ),
+      },
     ],
   },
 ]);
