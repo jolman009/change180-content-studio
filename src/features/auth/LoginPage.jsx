@@ -96,12 +96,12 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen">
       {/* Left — Landing / Brand Panel */}
-      <div className="hidden w-1/2 flex-col justify-between bg-[var(--secondary)] p-10 text-white lg:flex xl:p-16">
+      <div className="hidden w-1/2 flex-col justify-between bg-[var(--primary)] p-10 text-white lg:flex xl:p-16">
         <div>
           <img
             src="/change180_logo.webp"
             alt="Change180 Life Coaching"
-            className="mb-2 h-20 w-auto brightness-0 invert"
+            className="mb-2 h-20 w-auto"
           />
           <p className="text-sm font-medium text-white/60">Content Studio</p>
         </div>
